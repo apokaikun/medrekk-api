@@ -68,12 +68,16 @@ def authenticate_user(
 
 
 def read_user(user_id: int, db: Session):
-    return db.query(MedRekkUser).filter(MedRekkUser.id == user_id).first()
+    try:
+        select_stmt = select(MedRekkUser).where(MedRekkUser.id == user_id)
+        user = db.execute(select_stmt).first()
+        return user
+    except Exception as e:
+        print(e)
+        pass
 
 
 def read_user_by_username(db: Session, username: str):
-    # user = db.query(MedRekkUser).filter(
-    #     MedRekkUser.username == username).first()
     try:
         select_stmt = select(MedRekkUser).where(
             MedRekkUser.username == username)

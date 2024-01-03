@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
-from fastapi import HTTPException, status
+from typing import Annotated
+from fastapi import Depends, HTTPException, Header, status
 from medrekk.schemas import User, Token
-from jose import jwt
+from medrekk.dependencies import oauth2_scheme
+from jose import JWTError, jwt
 from jose.constants import ALGORITHMS
 from .constants import JWT_KEY, HMAC_KEY, jwts_
 import shortuuid
@@ -29,11 +31,37 @@ def generate_access_token(user: User) -> Token:
     return token
 
 
-def verify_jwt_token(
+def _verify_jwt_token(
     token: str,
+) -> bool:
+    pass
+
+
+def verify_jwt_token(
+    token: Annotated[str, Depends(oauth2_scheme)]
 ) -> bool:
     unverified = jwt.get_unverified_claims(token)
     jti = unverified["jti"]
     aud = jwts_.get(jti)
     # If verification fails, jwterror is raised.
-    return jwt.decode(token, JWT_KEY, algorithms=ALGORITHMS.HS256, audience=aud)
+    try:
+        return jwt.decode(token, JWT_KEY, algorithms=ALGORITHMS.HS256, audience=aud)
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid token.",
+        )
+
+
+def check_self(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    user_id: str
+):
+    unverified = jwt.get_unverified_claims(token)
+    sub = unverified.get('sub')
+    if sub != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized."
+        )
+    return sub == user_id
