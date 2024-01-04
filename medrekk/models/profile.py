@@ -1,0 +1,29 @@
+from datetime import datetime
+from typing import Optional
+from .base import MedRekkBase
+from sqlmodel import Field
+from pydantic import EmailStr
+from sqlalchemy import Column, String
+
+
+class MedRekkProfile(MedRekkBase, table=True):
+    __tablename__ = "medrekk_profile"
+
+    user_id: str = Field(nullable=False)
+    lastname: str = Field(nullable=False)
+    middlename: Optional[str]
+    firstname: str = Field(nullable=False)
+
+    birthdate: datetime
+    gender: str
+
+    mobile: str
+    # email: EmailStr = Field(sa_column=Column(String()))
+    address_country: str
+    address_province: str
+    address_city: str
+    address_barangay: str
+    address_line1: str
+    address_line2: Optional[str]
+
+    religion: str
