@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Depends, status
+from fastapi import HTTPException, Depends
 from typing import Annotated, List
 from fastapi.routing import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
@@ -7,7 +7,6 @@ from medrekk.controllers import read_user, read_users, create_user
 from medrekk.schemas import User
 from medrekk.database.connection import get_db
 from medrekk.utils.auth import check_self, verify_jwt_token
-from jose.exceptions import JWTError
 
 user_routes = APIRouter()
 
@@ -30,7 +29,7 @@ async def get_user(
     user_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    return read_user(user_id, db)[0]
+    return read_user(user_id, db)
 
 
 # Get users
@@ -51,7 +50,7 @@ async def delete_user(
     user_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    user = read_user(user_id, db)[0]
+    user = read_user(user_id, db)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 

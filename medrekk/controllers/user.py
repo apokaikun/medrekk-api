@@ -3,10 +3,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import ValidationError
 import shortuuid
-from sqlmodel import select
+from sqlmodel import Session, select
 from medrekk.models import MedRekkUser
 from medrekk.schemas import User, UserBase
-from sqlalchemy.orm import Session
 
 from medrekk.dependencies import pwd_context
 
@@ -58,7 +57,7 @@ def authenticate_user(
             detail="User does not exists.",
             headers={"WWW-Authenticate": "Basic"},
         )
-    if not pwd_context.verify(user_form_data.password, user[0].password):
+    if not pwd_context.verify(user_form_data.password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid credentials for {user_form_data.username}.",
@@ -70,7 +69,7 @@ def authenticate_user(
 def read_user(user_id: int, db: Session):
     try:
         select_stmt = select(MedRekkUser).where(MedRekkUser.id == user_id)
-        user = db.execute(select_stmt).first()
+        user = db.exec(select_stmt).first()
         return user
     except Exception as e:
         print(e)
@@ -81,7 +80,7 @@ def read_user_by_username(db: Session, username: str):
     try:
         select_stmt = select(MedRekkUser).where(
             MedRekkUser.username == username)
-        user = db.execute(select_stmt).first()
+        user = db.exec(select_stmt).first()
         return user
 
     except Exception as e:

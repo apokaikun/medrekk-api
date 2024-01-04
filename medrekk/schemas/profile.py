@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import EmailStr
+from .base import MedRekkBaseModel
 
 
-class ProfileBase(BaseModel):
+class ProfileCreate(MedRekkBaseModel):
     lastname: str
     middlename: Optional[str]
     firstname: str
@@ -12,6 +13,7 @@ class ProfileBase(BaseModel):
     gender: str
 
     mobile: str
+    email: EmailStr
     address_country: str
     address_province: str
     address_city: str
@@ -22,15 +24,9 @@ class ProfileBase(BaseModel):
     religion: str
 
 
-class ProfileCreate(ProfileBase):
-    user_id: str
+class ProfileRead(ProfileCreate):
+    pass
 
 
-class ProfileUpdate(ProfileBase):
+class ProfileUpdate(ProfileCreate):
     updated: datetime
-
-
-class Profile(ProfileBase):
-    id: str
-
-    model_config = ConfigDict(from_attributes=True)

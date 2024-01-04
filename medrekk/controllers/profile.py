@@ -1,5 +1,5 @@
-from sqlmodel import Session
-from medrekk.models.profile import MedRekkProfile
+from sqlmodel import Session, select
+from medrekk.models.patient_profile import MedRekkPatientProfile
 from medrekk.schemas import ProfileCreate
 
 
@@ -12,8 +12,17 @@ def create_profile(
 
     Parameters:
     """
-    new_profile = MedRekkProfile().model_validate(profile)
+    new_profile = MedRekkPatientProfile().model_validate(profile)
     db.add(new_profile)
     db.commit()
     db.refresh(new_profile)
     return new_profile
+
+
+def read_profile(
+        profile_id: str,
+        db: Session
+):
+    select_stmt = select(MedRekkPatientProfile).where(
+        MedRekkPatientProfile.id == profile_id)
+    profile = db.exec(select_stmt).first()

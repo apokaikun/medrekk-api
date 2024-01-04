@@ -26,7 +26,7 @@ def auth(
     db: Annotated[Session, Depends(get_db)],
 ) -> Token:
     user = authenticate_user(db, user_form_data)
-    access_token = generate_access_token(user[0])
+    access_token = generate_access_token(user)
     return {'access_token': access_token, 'token_type': 'bearer'}
 
 

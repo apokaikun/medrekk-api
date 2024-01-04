@@ -1,8 +1,9 @@
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr
+from .base import MedRekkBaseModel
 
 
-class UserBase(BaseModel):
+class UserBase(MedRekkBaseModel):
     username: EmailStr
 
 
@@ -14,7 +15,6 @@ class UserUpdate(UserCreate):
     """
     Pydantic model for updating user's password.
     """
-
     updated: datetime
 
 

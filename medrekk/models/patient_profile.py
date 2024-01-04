@@ -6,10 +6,9 @@ from pydantic import EmailStr
 from sqlalchemy import Column, String
 
 
-class MedRekkProfile(MedRekkBase, table=True):
+class MedRekkPatientProfile(MedRekkBase, table=True):
     __tablename__ = "medrekk_profile"
 
-    user_id: str = Field(nullable=False)
     lastname: str = Field(nullable=False)
     middlename: Optional[str]
     firstname: str = Field(nullable=False)
@@ -18,7 +17,7 @@ class MedRekkProfile(MedRekkBase, table=True):
     gender: str
 
     mobile: str
-    # email: EmailStr = Field(sa_column=Column(String()))
+    email: EmailStr = Field(sa_column=Column(String()))
     address_country: str
     address_province: str
     address_city: str
