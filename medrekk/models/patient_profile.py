@@ -7,7 +7,7 @@ from sqlalchemy import Column, String
 
 
 class MedRekkPatientProfile(MedRekkBase, table=True):
-    __tablename__ = "medrekk_profile"
+    __tablename__ = "medrekk_patient_profile"
 
     lastname: str = Field(nullable=False)
     middlename: Optional[str]
