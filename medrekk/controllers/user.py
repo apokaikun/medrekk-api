@@ -48,7 +48,8 @@ def create_user(
 
 
 def authenticate_user(
-    db: Session, user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    db: Session,
+    user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> User:
     user = read_user_by_username(db, user_form_data.username)
     if not user:
@@ -63,10 +64,13 @@ def authenticate_user(
             detail=f"Invalid credentials for {user_form_data.username}.",
             headers={"WWW-Authenticate": "Basic"},
         )
-    return user
+    return User(**user.model_dump())
 
 
-def read_user(user_id: int, db: Session):
+def read_user(
+    user_id: int,
+    db: Session
+) -> MedRekkUser:
     try:
         select_stmt = select(MedRekkUser).where(MedRekkUser.id == user_id)
         user = db.exec(select_stmt).first()
@@ -76,7 +80,10 @@ def read_user(user_id: int, db: Session):
         pass
 
 
-def read_user_by_username(db: Session, username: str):
+def read_user_by_username(
+    db: Session,
+    username: str
+) -> MedRekkUser:
     try:
         select_stmt = select(MedRekkUser).where(
             MedRekkUser.username == username)
@@ -85,12 +92,16 @@ def read_user_by_username(db: Session, username: str):
 
     except Exception as e:
         print(e)
-        pass
+        return
 
 
-def read_users(db: Session, skip: int = 0, limit: int = 10):
-    return db.query(MedRekkUser).offset(skip).limit(limit).all()
-
+def read_users(db: Session) -> list[MedRekkUser]:
+    try:
+        select_stmt = select(MedRekkUser)
+        return db.exec(select_stmt).all()
+    except Exception as e:
+        print(e)
+        return
 
 # def update_user(db: Session, user_id: int, user: UserUpdate):
 #     db_user = db.query(MedRekkUser).filter(MedRekkUser.id == user_id).first()
@@ -102,7 +113,12 @@ def read_users(db: Session, skip: int = 0, limit: int = 10):
 
 
 def delete_user(db: Session, user_id: int):
-    db_user = db.query(MedRekkUser).filter(MedRekkUser.id == user_id).first()
-    db.delete(db_user)
-    db.commit()
-    return db_user
+    try:
+        select_stmt = select(MedRekkUser).where(MedRekkUser.id == user_id)
+        db_user = db.exec(select_stmt).first()
+        db.delete(db_user)
+        db.commit()
+        return db_user
+    except Exception as e:
+        print(e)
+        return
