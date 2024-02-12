@@ -12,7 +12,7 @@ class MedRekkPatientProfile(MedRekkBase, table=True):
     lastname: str = Field(nullable=False)
     middlename: Optional[str]
     firstname: str = Field(nullable=False)
-
+    suffix: Optional[str]
     birthdate: datetime
     gender: str
 

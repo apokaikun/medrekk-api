@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
 from medrekk.database.connection import get_db
-from medrekk.controllers import create_profile
+from medrekk.controllers import create_profile, read_profile
 from medrekk.schemas import ProfileCreate, ProfileRead
 from medrekk.utils.auth import verify_jwt_token
 

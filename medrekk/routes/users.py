@@ -11,20 +11,39 @@ from medrekk.utils.auth import check_self, verify_jwt_token
 user_routes = APIRouter()
 
 
-# Create a new user
-@user_routes.post("/register/", response_model=User)
+@user_routes.post("/users/", response_model=User)
 async def register(
     user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Annotated[Session, Depends(get_db)],
 ):
+    """
+    Create a new user. Requires `email` and `password`
+    """
     user = create_user(user_form_data, db)
     if user is None:
         raise HTTPException(status_code=500)
     return user
 
 
+"""
+Routes that requires a valid jwt_token
+"""
+user_routes_verified = APIRouter(dependencies=[Depends(verify_jwt_token)])
+
+
+@user_routes_verified.get("/users/", response_model=List[User])
+async def get_users(
+        db: Annotated[Session, Depends(get_db)]
+):
+    """
+    Get all users.
+    """
+    return read_users(db)
+
 # Get a specific user by user ID
-@user_routes.get("/users/{user_id}", response_model=User, dependencies=[Depends(verify_jwt_token)])
+
+
+@user_routes_verified.get("/users/{user_id}", response_model=User, dependencies=[Depends(verify_jwt_token)])
 async def get_user(
     user_id: str,
     db: Annotated[Session, Depends(get_db)],
@@ -32,20 +51,12 @@ async def get_user(
     return read_user(user_id, db)
 
 
-# Get users
-@user_routes.get("/users/", response_model=List[User], dependencies=[Depends(verify_jwt_token)])
-async def get_users(
-        db: Annotated[Session, Depends(get_db)]
-):
-    return read_users(db)
-
-
 # Delete self. Only self can delete itself.
 # TODO: Add a scope based authorization to add a 'delete user' scope to delete other than self.
 
-@user_routes.delete("/users/{user_id}",
-                    response_model=User,
-                    dependencies=[Depends(verify_jwt_token), Depends(check_self)])
+@user_routes_verified.delete("/users/{user_id}",
+                             response_model=User,
+                             dependencies=[Depends(verify_jwt_token), Depends(check_self)])
 async def delete_user(
     user_id: str,
     db: Annotated[Session, Depends(get_db)],

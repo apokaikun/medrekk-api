@@ -10,6 +10,26 @@ from medrekk.schemas import User, UserBase
 from medrekk.dependencies import pwd_context
 
 
+def authenticate_user(
+    db: Session,
+    user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+) -> User:
+    user = read_user_by_username(db, user_form_data.username)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User does not exists.",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    if not pwd_context.verify(user_form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid credentials for {user_form_data.username}.",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return User(**user.model_dump())
+
+
 def create_user(
     user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session
 ):
@@ -45,26 +65,6 @@ def create_user(
     db.commit()
     db.refresh(user)
     return user
-
-
-def authenticate_user(
-    db: Session,
-    user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-) -> User:
-    user = read_user_by_username(db, user_form_data.username)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User does not exists.",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    if not pwd_context.verify(user_form_data.password, user.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid credentials for {user_form_data.username}.",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return User(**user.model_dump())
 
 
 def read_user(

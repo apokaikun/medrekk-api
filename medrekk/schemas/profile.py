@@ -1,13 +1,14 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import EmailStr
+from pydantic import BaseModel, EmailStr
 from .base import MedRekkBaseModel
 
 
-class ProfileCreate(MedRekkBaseModel):
+class ProfileCreate(BaseModel):
     lastname: str
     middlename: Optional[str]
     firstname: str
+    sufix: Optional[str]
 
     birthdate: datetime
     gender: str
@@ -25,7 +26,7 @@ class ProfileCreate(MedRekkBaseModel):
 
 
 class ProfileRead(ProfileCreate):
-    pass
+    id: str
 
 
 class ProfileUpdate(ProfileCreate):

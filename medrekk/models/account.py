@@ -14,9 +14,9 @@ def getTrialEndsAt() -> datetime:
 class MedRekkAccount(MedRekkBase, table=True):
     __tablename__ = "medrekk_accounts"
 
+    accountName: str
     ownerID: str = Field(
         default=uuid(), primary_key=True, unique=True)
-    accountName: str
     members: Optional[List[str]] = Field(
         default=None,
         sa_column=Column(postgresql.ARRAY(String())))

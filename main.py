@@ -6,12 +6,13 @@ from medrekk.database.connection import get_db
 from medrekk.schemas import Token
 from medrekk.controllers import authenticate_user
 from medrekk.utils.auth import generate_access_token
-from medrekk.routes import user_routes, profile_routes
+from medrekk.routes import user_routes, user_routes_verified, profile_routes
 import uvicorn
 
 app = FastAPI()
 
 app.include_router(user_routes)
+app.include_router(user_routes_verified)
 app.include_router(profile_routes)
 
 

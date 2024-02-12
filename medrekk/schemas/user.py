@@ -1,14 +1,17 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, SecretStr
 from .base import MedRekkBaseModel
 
 
-class UserBase(MedRekkBaseModel):
+class UserBase(BaseModel):
+    """
+    usernames are required to be emails for easy verification.
+    """
     username: EmailStr
 
 
 class UserCreate(UserBase):
-    password: str
+    password: SecretStr
 
 
 class UserUpdate(UserCreate):
@@ -18,11 +21,9 @@ class UserUpdate(UserCreate):
     updated: datetime
 
 
-class User(UserBase):
+class User(UserCreate, MedRekkBaseModel):
     """
     Pydantic model for Users.
-    Returns `email` and `id`
+    Returns `username` and `id`
     """
-    id: str
-
     model_config = ConfigDict(from_attributes=True)
