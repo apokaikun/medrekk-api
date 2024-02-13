@@ -1,8 +1,8 @@
 from typing import Annotated
 from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
-from medrekk.database.connection import get_db
+from sqlmodel import Session
+from medrekk.database.connection import create_db_and_tables, get_db
 from medrekk.schemas import Token
 from medrekk.controllers import authenticate_user
 from medrekk.utils.auth import generate_access_token
@@ -31,12 +31,12 @@ def auth(
     return {'access_token': access_token, 'token_type': 'bearer'}
 
 
-# @app.get('/drop')
-# async def drop(
-#     db: Session = Depends(get_db)
-# ):
-#     create_db_and_tables(True)
-#     return {}
+@app.get('/drop')
+async def drop(
+    db: Session = Depends(get_db)
+):
+    create_db_and_tables(True)
+    return {}
 
 
 if __name__ == "__main__":
