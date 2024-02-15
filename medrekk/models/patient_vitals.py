@@ -9,6 +9,9 @@ from medrekk.models import MedRekkBase
 class MedRekkVitalsBloodPressure(MedRekkBase, table=True):
     __tablename__ = "medrekk_vitals_blood_pressure"
 
+    patient_id: str = Field(
+        default=None,
+        foreign_key='medrekk_patient_profile.id')
     systolic: float
     diastolic: float
 

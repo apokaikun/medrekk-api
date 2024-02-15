@@ -4,8 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import ValidationError
 import shortuuid
 from sqlmodel import Session, select
-from medrekk.models import MedRekkUser
-from medrekk.schemas import User, UserBase
+from medrekk.models import MedRekkUser, MedRekkUserRead, MedRekkUserBase
 
 from medrekk.dependencies import pwd_context
 
@@ -13,7 +12,7 @@ from medrekk.dependencies import pwd_context
 def authenticate_user(
     db: Session,
     user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-) -> User:
+) -> MedRekkUserRead:
     user = read_user_by_username(db, user_form_data.username)
     if not user:
         raise HTTPException(
@@ -27,7 +26,7 @@ def authenticate_user(
             detail=f"Invalid credentials for {user_form_data.username}.",
             headers={"WWW-Authenticate": "Basic"},
         )
-    return User(**user.model_dump())
+    return MedRekkUserRead(**user.model_dump())
 
 
 def create_user(
@@ -46,7 +45,7 @@ def create_user(
     try:
         # Test if username provided is an email.
         # User pydantic's EmailStr data-type for validation.
-        UserBase(username=user_form_data.username)
+        MedRekkUserBase(username=user_form_data.username)
     except ValidationError as e:
         print(e.json())
         # TODO: return the error to client if username is not an email.

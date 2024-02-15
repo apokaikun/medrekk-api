@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Annotated
 from fastapi import Depends, HTTPException, Header, status
-from medrekk.schemas import User, Token
+from medrekk.models import medrekk_user_account
+from medrekk.schemas import Token
 from medrekk.dependencies import oauth2_scheme
 from jose import JWTError, jwt
 from jose.constants import ALGORITHMS
@@ -10,7 +11,7 @@ import shortuuid
 import hmac
 
 
-def generate_access_token(user: User) -> Token:
+def generate_access_token(user: medrekk_user_account) -> Token:
     iat = datetime.now()
     exp = iat + timedelta(minutes=60)
     sub = user.id
