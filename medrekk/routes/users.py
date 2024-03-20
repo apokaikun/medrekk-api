@@ -1,19 +1,36 @@
-from fastapi import HTTPException, Depends
 from typing import Annotated, List
+
+from fastapi import Depends, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from medrekk.controllers import read_user, read_users, create_user
+
+from medrekk.controllers import create_user, read_user, read_users
 from medrekk.database.connection import get_db
-from medrekk.models import MedRekkUserRead
+from medrekk.schemas import UserCreate, UserRead, UserListItem
+from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.utils.auth import check_self, verify_jwt_token
 
 user_routes = APIRouter()
 
 
-@user_routes.post("/users/", response_model=MedRekkUserRead)
+@user_routes.post(
+    "/users/",
+    response_model=UserRead,
+    status_code=201,
+    responses={
+        409: {
+            "description": "HTTP_409_CONFLICT. There is an error in creating the user.",
+            "model": HTTP_EXCEPTION
+        },
+        500: {
+            "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+            "model": HTTP_EXCEPTION
+        },
+    },
+)
 async def register(
-    user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    user_form_data: UserCreate,
     db: Annotated[Session, Depends(get_db)],
 ):
     """
@@ -21,7 +38,10 @@ async def register(
     """
     user = create_user(user_form_data, db)
     if user is None:
-        raise HTTPException(status_code=500)
+        raise JSONResponse(
+            content="HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+            status_code=500,
+            )
     return user
 
 
@@ -31,19 +51,20 @@ Routes that requires a valid jwt_token
 user_routes_verified = APIRouter(dependencies=[Depends(verify_jwt_token)])
 
 
-@user_routes_verified.get("/users/", response_model=List[MedRekkUserRead])
-async def get_users(
-        db: Annotated[Session, Depends(get_db)]
-):
+@user_routes_verified.get("/users/", response_model=List[UserListItem])
+async def get_users(db: Annotated[Session, Depends(get_db)]):
     """
     Get all users.
     """
     return read_users(db)
 
+
 # Get a specific user by user ID
-
-
-@user_routes_verified.get("/users/{user_id}", response_model=MedRekkUserRead, dependencies=[Depends(verify_jwt_token)])
+@user_routes_verified.get(
+    "/users/{user_id}",
+    response_model=UserRead,
+    dependencies=[Depends(verify_jwt_token)],
+)
 async def get_user(
     user_id: str,
     db: Annotated[Session, Depends(get_db)],
@@ -54,9 +75,12 @@ async def get_user(
 # Delete self. Only self can delete itself.
 # TODO: Add a scope based authorization to add a 'delete user' scope to delete other than self.
 
-@user_routes_verified.delete("/users/{user_id}",
-                             response_model=MedRekkUserRead,
-                             dependencies=[Depends(verify_jwt_token), Depends(check_self)])
+
+@user_routes_verified.delete(
+    "/users/{user_id}",
+    response_model=UserRead,
+    dependencies=[Depends(verify_jwt_token), Depends(check_self)],
+)
 async def delete_user(
     user_id: str,
     db: Annotated[Session, Depends(get_db)],

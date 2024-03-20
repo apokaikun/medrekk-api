@@ -1,37 +1,42 @@
-from typing import Annotated
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import ValidationError
-import shortuuid
-from sqlmodel import Session, select
-from medrekk.models import MedRekkUser, MedRekkUserRead, MedRekkUserBase
+from typing import List
 
-from medrekk.dependencies import pwd_context
+from fastapi import HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import select
+from sqlalchemy.exc import DBAPIError
+from sqlalchemy.orm import Session
+
+from medrekk.models import MedRekkUser
+from medrekk.schemas import UserCreate, UserRead
+from medrekk.utils import shortid
+from medrekk.utils.auth import hash_password, verify_password
 
 
 def authenticate_user(
     db: Session,
-    user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
-) -> MedRekkUserRead:
+    user_form_data: OAuth2PasswordRequestForm,
+) -> UserRead:
     user = read_user_by_username(db, user_form_data.username)
-    if not user:
+    
+    if not verify_password(user.password, user_form_data.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User does not exists.",
+            detail={
+                    "status_code": status.HTTP_401_UNAUTHORIZED,
+                    "content": {
+                        "msg": f"Invalid credentials for {user_form_data.username}.",
+                        "loc": "[username, password]",
+                    },
+                },
             headers={"WWW-Authenticate": "Basic"},
         )
-    if not pwd_context.verify(user_form_data.password, user.password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid credentials for {user_form_data.username}.",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return MedRekkUserRead(**user.model_dump())
+    return UserRead.model_validate(user)
 
 
 def create_user(
-    user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session
-):
+    user_form_data: UserCreate,
+    db: Session,
+) -> UserRead:
     """
     Controller to handle user create requests.
 
@@ -42,68 +47,124 @@ def create_user(
         db: Session
             Database session
     """
+
     try:
         # Test if username provided is an email.
         # User pydantic's EmailStr data-type for validation.
-        MedRekkUserBase(username=user_form_data.username)
-    except ValidationError as e:
-        print(e.json())
-        # TODO: return the error to client if username is not an email.
-        return
-    if read_user_by_username(db, user_form_data.username):
+        user = MedRekkUser(
+            id=shortid(),
+            username=user_form_data.username,
+            password=hash_password(
+                user_form_data.password.get_secret_value(),
+            ),
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        return UserRead.model_validate(user)
+    except DBAPIError as e:
+        sqlstate = e.orig.sqlstate
+        if sqlstate == "23505":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": f"Username {user.username} is already used.",
+                        "loc": "username",
+                    },
+                },
+            )
         raise HTTPException(
-            status_code=422,
-            detail={"error": f"Email {user_form_data.username} is already used."},
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "content": {
+                        "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+                    },
+                },
         )
 
-    password = pwd_context.hash(user_form_data.password)
-    user = MedRekkUser(username=user_form_data.username)
-    user.password = password
-    user.id = shortuuid.uuid()
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
 
-
-def read_user(
-    user_id: int,
-    db: Session
-) -> MedRekkUser:
+def read_user(user_id: int, db: Session) -> UserRead:
     try:
-        select_stmt = select(MedRekkUser).where(MedRekkUser.id == user_id)
-        user = db.exec(select_stmt).first()
-        return user
-    except Exception as e:
-        print(e)
-        pass
+        user = db.get(MedRekkUser, user_id)
+
+        if user and isinstance(user, MedRekkUser):
+            return UserRead.model_validate(user)
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "status_code": status.HTTP_404_NOT_FOUND,
+                "content": {
+                    "msg": f"User is user_id:{user_id} does not exist.",
+                    "loc": "user_id",
+                },
+            },
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "content": {
+                        "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+                    },
+                },
+        )
 
 
-def read_user_by_username(
-    db: Session,
-    username: str
-) -> MedRekkUser:
+def read_user_by_username(db: Session, username: str) -> MedRekkUser:
     try:
-        select_stmt = select(MedRekkUser).where(
-            MedRekkUser.username == username)
-        user = db.exec(select_stmt).first()
-        return user
+        select_stmt = select(MedRekkUser).where(MedRekkUser.username == username)
+        user = db.scalars(select_stmt).first()
+        
+        if user:
+            return user
+        
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "status_code": status.HTTP_404_NOT_FOUND,
+                "content": {
+                    "msg": f"User `{username}` does not exist.",
+                    "loc": "username",
+                },
+            },
+        )
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "content": {
+                        "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+                    },
+                },
+        )
 
-    except Exception as e:
-        print(e)
-        return
 
-
-def read_users(db: Session) -> list[MedRekkUser]:
+def read_users(db: Session) -> List[MedRekkUser]:
     try:
         select_stmt = select(MedRekkUser)
-        return db.exec(select_stmt).all()
-    except Exception as e:
-        print(e)
-        return
+        users = db.scalars(select_stmt).all()
+        return users
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "content": {
+                        "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+                    },
+                },
+        )
+
 
 # def update_user(db: Session, user_id: int, user: UserUpdate):
-#     db_user = db.query(MedRekkUser).filter(MedRekkUser.id == user_id).first()
+#     db_user = db.query(UserCreate).filter(UserCreate.id == user_id).first()
 #     for field, value in user.model_dump(exclude_unset=True).items():
 #         setattr(db_user, field, value)
 #     db.commit()
@@ -114,10 +175,17 @@ def read_users(db: Session) -> list[MedRekkUser]:
 def delete_user(db: Session, user_id: int):
     try:
         select_stmt = select(MedRekkUser).where(MedRekkUser.id == user_id)
-        db_user = db.exec(select_stmt).first()
+        db_user = db.scalars(select_stmt).first()
         db.delete(db_user)
         db.commit()
         return db_user
-    except Exception as e:
-        print(e)
-        return
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "content": {
+                        "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+                    },
+                },
+        )
