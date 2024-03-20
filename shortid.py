@@ -1,10 +1,8 @@
-from datetime import datetime
+import binascii
 import math
 import os
-import binascii
-from typing import List, Optional
 import string
-import collections
+from typing import List, Optional
 
 
 def int_to_string(
@@ -24,23 +22,13 @@ def int_to_string(
     return output
 
 
-# ids = [int_to_string(int(binascii.b2a_hex(os.urandom(8)), 16), alpha)
-#        for _ in range(2**25)]
-# print(f'{2**25:,}', len(ids) - len(set(ids)),
-#       [(i, c) for i, c in collections.Counter(ids).items() if c > 1])
-
-
-class ShortRandomID():
-    """
-    """
+class ShortRandomID:
+    """ """
 
     def __init__(
-            self,
-            alpha: Optional[str] = None,
-            random_size: Optional[int] = None
+        self, alpha: Optional[str] = None, random_size: Optional[int] = None
     ) -> None:
-        """
-        """
+        """ """
         alpha = alpha if alpha else string.ascii_letters + string.digits
         self.set_alpha(alpha)
 
@@ -56,7 +44,7 @@ class ShortRandomID():
         """
         The effective length of the ID given the set alphabet.
         """
-        size = 2 ** self._random_length
+        size = 2**self._random_length
         return int(math.ceil(math.log(size, self._alpha_len)))
 
     def set_random_size(self, size: int) -> None:
@@ -79,15 +67,14 @@ class ShortRandomID():
         Sets the characters/symbols to be used for the random IDs.
         Default is set to `string.ascii_letters` + `string.digits`'
         """
-        new_alpha = ''.join(set(alpha))
+        new_alpha = "".join(set(alpha))
         if len(new_alpha) > 1:
             self._alpha = new_alpha
         else:
             raise ValueError("Length of characters must be more the one (1).")
 
     def random(self, length: Optional[int] = None) -> str:
-        """
-        """
+        """ """
         if length is None:
             length = self._length
 

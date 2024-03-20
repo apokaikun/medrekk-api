@@ -1,13 +1,14 @@
 from typing import Annotated, List
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import JSONResponse
+
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from medrekk.controllers.accounts import create_account, read_account, read_accounts
+
+from medrekk.controllers.accounts import (create_account, read_account,
+                                          read_accounts)
 from medrekk.database.connection import get_db
 from medrekk.schemas import AccountCreate, AccountRead
 from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.utils.auth import get_user_id, verify_jwt_token
-
 
 account_routes = APIRouter(prefix="/accounts", dependencies=[Depends(verify_jwt_token)])
 
@@ -35,7 +36,7 @@ async def new_account(
 ):
 
     new_account = create_account(account, user_id, db)
-    
+
     return new_account
 
 

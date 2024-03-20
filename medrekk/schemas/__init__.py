@@ -2,33 +2,52 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from .account_users import (AccountCreate, AccountRead, AccountUpdate,
-                            ProfileCreate, ProfileRead, UserBase, UserCreate,
-                            UserRead, UserUpdate, Users, UserListItem)
+from .account_users import (
+    AccountCreate,
+    AccountRead,
+    AccountUpdate,
+    ProfileCreate,
+    ProfileRead,
+    UserBase,
+    UserCreate,
+    UserRead,
+    UserUpdate,
+    Users,
+    UserListItem,
+)
+
+from .patients import (
+    PatientProfileCreate,
+    PatientProfileRead,
+    PatientProfileDelete,
+    PatientProfileUpdate,
+)
 
 
 class MedRekkBaseSchema(BaseModel):
-    id: str 
-    created: datetime 
-    updated: datetime 
+    id: str
+    created: datetime
+    updated: datetime
 
     model_config = ConfigDict(
-        from_attributes = True,
-        validate_assignment = True,
-        arbitrary_types_allowed = True
-        )
-    
+        from_attributes=True, validate_assignment=True, arbitrary_types_allowed=True
+    )
+
 
 __all__ = [
-    "UserBase", 
-    "UserCreate", 
-    "UserRead", 
-    "UserUpdate", 
+    "UserBase",
+    "UserCreate",
+    "UserRead",
+    "UserUpdate",
     "UserListItem",
     "Users",
-    "AccountCreate", 
-    "AccountRead", 
+    "AccountCreate",
+    "AccountRead",
     "AccountUpdate",
     "ProfileCreate",
     "ProfileRead",
+    "PatientProfileCreate",
+    "PatientProfileRead",
+    "PatientProfileDelete",
+    "PatientProfileUpdate",
 ]

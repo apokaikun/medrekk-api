@@ -1,5 +1,4 @@
-from datetime import timedelta
-import time
+from datetime import timedelta, datetime, timezone
 from redis import Redis
 
 from medrekk.utils.constants import TOKEN_EXPIRE_MINUTES
@@ -10,8 +9,8 @@ class TokenStorage:
     def __init__(self, db: Redis) -> None:
         self.db: Redis = db
 
-    def set_token(self, jti: str, aud: str, exp: int) -> None:
-        self.db.set(jti, aud, ex=time() + timedelta(minutes=TOKEN_EXPIRE_MINUTES + 1))
+    def set_token(self, jti: str, aud: str) -> None:
+        self.db.set(jti, aud, ex=timedelta(minutes=TOKEN_EXPIRE_MINUTES + 1))
 
     def get_token(self, jti: str) -> str | None:
         return self.db.get(jti)
