@@ -23,6 +23,7 @@ class PatientProfile(Base, PatientBase):
     birthdate = Column(Date, nullable=True)
     gender = Column(String, nullable=True)
     mobile = Column(String, nullable=True)
+    email = Column(String, nullable=True)
     address_country = Column(String, nullable=False)
     address_province = Column(String, nullable=False)
     address_city = Column(String, nullable=False)
