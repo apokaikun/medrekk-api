@@ -57,7 +57,7 @@ class PatientRespiratoryRate(Base, PatientBase):
     __tablename__ = "patient_respiratory_rate"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    heart_rate = Column(SMALLINT)
+    respiratory_rate = Column(SMALLINT)
 
 
 class PatientBodyTemperature(Base, PatientBase):
@@ -141,8 +141,8 @@ class PatientMedication(Base, PatientBase):
     patient_id = Column(ForeignKey("patient_profile.id"))
     medication = Column(String)
     start_date = Column(Date)
-    end_date = Column(Date)
-    notes = Column(ARRAY(String))
+    end_date = Column(Date, nullable=True)
+    notes = Column(ARRAY(String), nullable=True)
 
 
 # Patient OB History
