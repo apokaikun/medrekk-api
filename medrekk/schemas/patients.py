@@ -9,7 +9,9 @@ class PatientBase(BaseModel):
     updated: datetime = datetime.now()
 
     model_config = ConfigDict(
-        from_attributes=True, validate_assignment=True, arbitrary_types_allowed=True
+        from_attributes=True,
+        validate_assignment=True,
+        arbitrary_types_allowed=True,
     )
 
 
@@ -45,11 +47,6 @@ class PatientProfileDelete(BaseModel):
     id: str
 
 
-# Patient Vitals:
-#   PatientBloodPressure,
-#   PatientHeartRate,
-#   PatientRespiratoryRate,
-#   PatientBodyTemperature
 class PatientBloodPressureCreate(BaseModel):
     patient_id: str
     systolic: int
@@ -169,6 +166,7 @@ class PatientBodyMassIndexUpdate(PatientBodyMassIndexCreate):
 class PatientBodyMassIndexDelete(BaseModel):
     id: str
 
+
 class PatientFamilyHistoryCreate(BaseModel):
     patient_id: str
     hypertension: bool = False
@@ -177,14 +175,18 @@ class PatientFamilyHistoryCreate(BaseModel):
     cancer: str = False
     others: List[str] = []
 
+
 class PatientFamilyHistoryRead(PatientFamilyHistoryCreate, PatientBase):
     pass
+
 
 class PatientFamilyHistoryUpdate(PatientFamilyHistoryCreate):
     updated: datetime = datetime.now()
 
+
 class PatientFamilyHistoryDelete(BaseModel):
     id: str
+
 
 class PatientHospitalizationHistoryCreate(BaseModel):
     patient_id: str
@@ -193,14 +195,20 @@ class PatientHospitalizationHistoryCreate(BaseModel):
     discharge_date: date
     notes: str
 
-class PatientHospitalizationHistoryRead(PatientHospitalizationHistoryCreate, PatientBase):
+
+class PatientHospitalizationHistoryRead(
+    PatientHospitalizationHistoryCreate, PatientBase
+):
     pass
+
 
 class PatientHospitalizationHistoryUpdate(PatientHospitalizationHistoryCreate):
     updated: datetime = datetime.now()
 
+
 class PatientHospitalizationHistoryDelete(BaseModel):
     id: str
+
 
 class PatientMedicalHistoryCreate(BaseModel):
     patient_id: str
@@ -210,14 +218,18 @@ class PatientMedicalHistoryCreate(BaseModel):
     cancer: bool = False
     others: List[str] = []
 
+
 class PatientMedicalHistoryRead(PatientMedicalHistoryCreate, PatientBase):
     pass
+
 
 class PatientMedicalHistoryUpdate(PatientMedicalHistoryCreate):
     updated: datetime = datetime.now()
 
+
 class PatientMedicalHistoryDelete(BaseModel):
     id: str
+
 
 class PatientMedicationCreate(BaseModel):
     patient_id: str
@@ -226,14 +238,18 @@ class PatientMedicationCreate(BaseModel):
     end_date: Optional[datetime] = None
     notes: Optional[str] = None
 
+
 class PatientMedicationRead(PatientMedicationCreate, PatientBase):
     pass
+
 
 class PatientMedicationUpdate(PatientMedicationCreate):
     updated: datetime = datetime.now()
 
+
 class PatientMedicationDelete(BaseModel):
     id: str
+
 
 class PatientOBHistoryCreate(BaseModel):
     patient_id: str
@@ -246,14 +262,18 @@ class PatientOBHistoryCreate(BaseModel):
     others: List[str] = []
     notes: List[str] = []
 
+
 class PatientOBHistoryRead(PatientOBHistoryCreate, PatientBase):
     pass
+
 
 class PatientOBHistoryUpdate(PatientOBHistoryCreate):
     updated: datetime = datetime.now()
 
+
 class PatientOBHistoryDelete(BaseModel):
     id: str
+
 
 class PatientSurgicalHistoryCreate(BaseModel):
     patient_id: str
