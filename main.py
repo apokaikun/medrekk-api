@@ -12,14 +12,15 @@ from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.schemas.token import Token
 from medrekk.utils.auth import generate_access_token
 
-VERSION = "0.0.1"
+VERSION = "202403"
 VERSION_SUFFIX = "pre-alpha"
-DOCS_URL = "/latest/docs"
+DOCS_URL = f"/{VERSION}-{VERSION_SUFFIX}/docs"
+
 medrekk_app = FastAPI(
     title="MedRekk",
-    version=f"version {VERSION}-{VERSION_SUFFIX}",
+    version=f"{VERSION}-{VERSION_SUFFIX}",
     docs_url=DOCS_URL,
-    root_path=f"/v{VERSION}",
+    root_path=f"/api/{VERSION}-{VERSION_SUFFIX}",
     debug=True,
 )
 
@@ -31,7 +32,7 @@ def root():
 
 
 @medrekk_app.post(
-    "/latest/auth",
+    f"/{VERSION}-{VERSION_SUFFIX}/auth",
     response_model=Token,
     status_code=200,
     description="Successful username and password authentication.",
@@ -59,3 +60,4 @@ medrekk_app.include_router(user_routes)
 medrekk_app.include_router(user_routes_verified)
 medrekk_app.include_router(account_routes)
 medrekk_app.include_router(profile_routes)
+medrekk_app.include_router(patient_routes)

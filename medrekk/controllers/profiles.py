@@ -57,7 +57,7 @@ def read_profile(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"http": f"Profile with id: `{profile_id}` does not exist."},
+                "content": {"msg": f"Profile with id: `{profile_id}` does not exist."},
             },
         )
     # Add this as a dependency. `own_profile`

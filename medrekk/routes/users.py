@@ -35,6 +35,11 @@ async def register(
 ):
     """
     Create a new user. Requires `email` and `password`
+
+    This is a new line:
+    --------------    
+    
+
     """
     user = create_user(user_form_data, db)
     if user is None:
