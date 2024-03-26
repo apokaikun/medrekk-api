@@ -21,6 +21,10 @@ from .patients import (
     PatientProfileRead,
     PatientProfileDelete,
     PatientProfileUpdate,
+    PatientBloodPressureCreate,
+    PatientBloodPressureRead,
+    PatientBloodPressureUpdate,
+    PatientBloodPressureDelete,
 )
 
 
@@ -50,4 +54,8 @@ __all__ = [
     "PatientProfileRead",
     "PatientProfileDelete",
     "PatientProfileUpdate",
+    "PatientBloodPressureCreate",
+    "PatientBloodPressureRead",
+    "PatientBloodPressureUpdate",
+    "PatientBloodPressureDelete",
 ]

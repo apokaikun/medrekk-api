@@ -48,7 +48,6 @@ class PatientProfileDelete(BaseModel):
 
 
 class PatientBloodPressureCreate(BaseModel):
-    patient_id: str
     systolic: int
     diastolic: int
 

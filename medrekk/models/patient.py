@@ -1,16 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import (
-    ARRAY,
-    SMALLINT,
-    Boolean,
-    Column,
-    Date,
-    DateTime,
-    Float,
-    ForeignKey,
-    String,
-)
+from sqlalchemy import (ARRAY, SMALLINT, Boolean, Column, Date, DateTime,
+                        Float, ForeignKey, String)
 
 from medrekk.database.connection import Base
 from medrekk.utils import shortid
