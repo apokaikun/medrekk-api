@@ -8,6 +8,11 @@ from .patients import (
     read_patient_bloodpressures,
     update_patient_bloodpressure,
     delete_patient_bloodpressure,
+    create_patient_heartrate,
+    read_patient_heartrate,
+    read_patient_heartrates,
+    update_patient_heartrate,
+    delete_patient_heartrate,
 )
 from .profiles import create_profile, read_profile
 from .users import create_user, read_user, read_user_by_username, read_users
@@ -30,4 +35,9 @@ __all__ = [
     "read_patient_bloodpressures",
     "update_patient_bloodpressure",
     "delete_patient_bloodpressure",
+    "create_patient_heartrate",
+    "read_patient_heartrate",
+    "read_patient_heartrates",
+    "update_patient_heartrate",
+    "delete_patient_heartrate",
 ]
