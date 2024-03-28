@@ -1,19 +1,26 @@
 from .accounts import create_account, read_account, read_accounts
-from .patients import (
-    create_patient,
-    read_patients,
-    read_patient,
+from .patient_bloodpressure import (
     create_patient_bloodpressure,
+    delete_patient_bloodpressure,
     read_patient_bloodpressure,
     read_patient_bloodpressures,
     update_patient_bloodpressure,
-    delete_patient_bloodpressure,
+)
+from .patient_heartrate import (
     create_patient_heartrate,
+    delete_patient_heartrate,
     read_patient_heartrate,
     read_patient_heartrates,
     update_patient_heartrate,
-    delete_patient_heartrate,
 )
+from .patient_respiratory import (
+    create_respiratory,
+    delete_repiratory,
+    read_respiratories,
+    read_respiratory,
+    update_respiratory,
+)
+from .patients import create_patient, read_patient, read_patients, update_patient
 from .profiles import create_profile, read_profile
 from .users import create_user, read_user, read_user_by_username, read_users
 
@@ -30,6 +37,7 @@ __all__ = [
     "create_patient",
     "read_patients",
     "read_patient",
+    "update_patient",
     "create_patient_bloodpressure",
     "read_patient_bloodpressure",
     "read_patient_bloodpressures",
@@ -40,4 +48,9 @@ __all__ = [
     "read_patient_heartrates",
     "update_patient_heartrate",
     "delete_patient_heartrate",
+    "create_respiratory",
+    "read_respiratories",
+    "read_respiratory",
+    "update_respiratory",
+    "delete_repiratory",
 ]

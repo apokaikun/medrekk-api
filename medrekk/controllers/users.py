@@ -7,10 +7,11 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.models import MedRekkUser
-from medrekk.schemas import UserCreate, UserRead
+from medrekk.schemas import UserCreate, UserRead, UserUpdate
 from medrekk.utils import shortid
 from medrekk.utils.auth import hash_password, verify_password
 
+from psycopg.errors import UniqueViolation
 
 def authenticate_user(
     db: Session,
@@ -64,8 +65,9 @@ def create_user(
 
         return UserRead.model_validate(user)
     except DBAPIError as e:
-        sqlstate = e.orig.sqlstate
-        if sqlstate == "23505":
+        # sqlstate = e.orig.sqlstate
+        # if sqlstate == "23505":
+        if isinstance(e.orig, UniqueViolation):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail={
@@ -87,14 +89,12 @@ def create_user(
         )
 
 
-def read_user(user_id: int, db: Session) -> UserRead:
+def read_user(user_id: int, db: Session) -> MedRekkUser:
     try:
         user = db.get(MedRekkUser, user_id)
 
-        if user and isinstance(user, MedRekkUser):
-            return UserRead.model_validate(user)
-        
-        raise HTTPException(
+        if not user:
+            raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
@@ -104,6 +104,10 @@ def read_user(user_id: int, db: Session) -> UserRead:
                 },
             },
         )
+        
+        return user
+        
+        
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -148,8 +152,9 @@ def read_user_by_username(db: Session, username: str) -> MedRekkUser:
 
 def read_users(db: Session) -> List[MedRekkUser]:
     try:
-        select_stmt = select(MedRekkUser)
-        users = db.scalars(select_stmt).all()
+        # select_stmt = select(MedRekkUser)
+        # users = db.scalars(select_stmt).all()
+        users = db.query(MedRekkUser).all()
         return users
     except Exception:
         raise HTTPException(
@@ -163,13 +168,16 @@ def read_users(db: Session) -> List[MedRekkUser]:
         )
 
 
-# def update_user(db: Session, user_id: int, user: UserUpdate):
-#     db_user = db.query(UserCreate).filter(UserCreate.id == user_id).first()
-#     for field, value in user.model_dump(exclude_unset=True).items():
-#         setattr(db_user, field, value)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
+def update_user(db: Session, user_id: int, user: UserUpdate):
+
+    db_user = db.query(UserCreate).filter(UserCreate.id == user_id).first()
+    for field, value in user.model_dump(exclude_unset=True).items():
+        setattr(db_user, field, value)
+
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 
 def delete_user(db: Session, user_id: int):

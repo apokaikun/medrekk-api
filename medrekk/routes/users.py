@@ -21,11 +21,11 @@ user_routes = APIRouter()
     responses={
         409: {
             "description": "HTTP_409_CONFLICT. There is an error in creating the user.",
-            "model": HTTP_EXCEPTION
+            "model": HTTP_EXCEPTION,
         },
         500: {
             "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-            "model": HTTP_EXCEPTION
+            "model": HTTP_EXCEPTION,
         },
     },
 )
@@ -37,8 +37,8 @@ async def register(
     Create a new user. Requires `email` and `password`
 
     This is a new line:
-    --------------    
-    
+    --------------
+
 
     """
     user = create_user(user_form_data, db)
@@ -46,7 +46,7 @@ async def register(
         raise JSONResponse(
             content="HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
             status_code=500,
-            )
+        )
     return user
 
 
@@ -56,25 +56,31 @@ Routes that requires a valid jwt_token
 user_routes_verified = APIRouter(dependencies=[Depends(verify_jwt_token)])
 
 
-@user_routes_verified.get("/users/", response_model=List[UserListItem])
+@user_routes_verified.get(
+    "/users/",
+    response_model=List[UserListItem],
+)
 async def get_users(db: Annotated[Session, Depends(get_db)]):
     """
     Get all users.
     """
-    return read_users(db)
+    users = read_users(db)
+
+    return [UserListItem.model_validate(user) for user in users]
 
 
 # Get a specific user by user ID
 @user_routes_verified.get(
     "/users/{user_id}",
     response_model=UserRead,
-    dependencies=[Depends(verify_jwt_token)],
 )
 async def get_user(
     user_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    return read_user(user_id, db)
+    user = read_user(user_id, db)
+
+    return UserRead.model_validate(user)
 
 
 # Delete self. Only self can delete itself.
@@ -84,7 +90,7 @@ async def get_user(
 @user_routes_verified.delete(
     "/users/{user_id}",
     response_model=UserRead,
-    dependencies=[Depends(verify_jwt_token), Depends(check_self)],
+    dependencies=[Depends(check_self)],
 )
 async def delete_user(
     user_id: str,

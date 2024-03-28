@@ -64,24 +64,21 @@ async def list_patients(
     db: Annotated[Session, Depends(get_db)],
 ):
     patients = read_patients(db)
-    validated = []
-    for patient in patients:
-        _patient = PatientProfileRead.model_validate(patient)
-        _patient.url = patient_routes.prefix + f"/{patient.id}"
-        validated.append(_patient)
 
-    return validated
+    return [PatientProfileRead.model_validate(patient) for patient in patients]
 
 
-@patient_routes.get("/{patient_id}", response_model=PatientProfileRead)
+@patient_routes.get(
+    "/{patient_id}",
+    response_model=PatientProfileRead,
+)
 async def get_patient(
     patient_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
     patient = read_patient(patient_id, db)
-    patient.url = patient_routes.prefix + f"/{patient_id}"
 
-    return patient
+    return PatientProfileRead.model_validate(patient)
 
 
 # @patient_routes.put(

@@ -48,6 +48,7 @@ class PatientProfileDelete(BaseModel):
 
 
 class PatientBloodPressureCreate(BaseModel):
+    dt_measured: datetime
     systolic: int
     diastolic: int
 
@@ -100,6 +101,7 @@ class PatientRespiratoryRateDelete(BaseModel):
 
 class PatientBodyTemperatureCreate(BaseModel):
     patient_id: str
+    dt_measured: datetime
     body_temperature: float
 
 

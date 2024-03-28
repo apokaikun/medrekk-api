@@ -10,25 +10,28 @@ from .account_users import (
     ProfileRead,
     UserBase,
     UserCreate,
-    UserRead,
-    UserUpdate,
-    Users,
     UserListItem,
+    UserRead,
+    Users,
+    UserUpdate,
 )
-
 from .patients import (
-    PatientProfileCreate,
-    PatientProfileRead,
-    PatientProfileDelete,
-    PatientProfileUpdate,
     PatientBloodPressureCreate,
+    PatientBloodPressureDelete,
     PatientBloodPressureRead,
     PatientBloodPressureUpdate,
-    PatientBloodPressureDelete,
     PatientHeartRateCreate,
+    PatientHeartRateDelete,
     PatientHeartRateRead,
     PatientHeartRateUpdate,
-    PatientHeartRateDelete,
+    PatientProfileCreate,
+    PatientProfileDelete,
+    PatientProfileRead,
+    PatientProfileUpdate,
+    PatientRespiratoryRateCreate,
+    PatientRespiratoryRateDelete,
+    PatientRespiratoryRateRead,
+    PatientRespiratoryRateUpdate,
 )
 
 
@@ -38,7 +41,9 @@ class MedRekkBaseSchema(BaseModel):
     updated: datetime
 
     model_config = ConfigDict(
-        from_attributes=True, validate_assignment=True, arbitrary_types_allowed=True
+        from_attributes=True,
+        validate_assignment=True,
+        arbitrary_types_allowed=True,
     )
 
 
@@ -66,4 +71,8 @@ __all__ = [
     "PatientHeartRateRead",
     "PatientHeartRateUpdate",
     "PatientHeartRateDelete",
+    "PatientRespiratoryRateCreate",
+    "PatientRespiratoryRateRead",
+    "PatientRespiratoryRateUpdate",
+    "PatientRespiratoryRateDelete",
 ]

@@ -26,6 +26,9 @@ venv
 docs.zip
 archive.zip
 
+# temp
+physician.py
+page_params.py
 # vim temporary files
 *~
 .*.sw?

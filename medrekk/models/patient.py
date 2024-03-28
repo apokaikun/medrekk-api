@@ -117,6 +117,7 @@ class PatientBodyTemperature(Base, PatientBase):
     __tablename__ = "patient_body_temperature"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
+    dt_measured = Column(DateTime)
     body_temperature = Column(Float)
 
 
