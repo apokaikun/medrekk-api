@@ -1,7 +1,18 @@
 from datetime import datetime
 
-from sqlalchemy import (ARRAY, SMALLINT, Boolean, Column, Date, DateTime,
-                        Float, ForeignKey, String)
+from sqlalchemy import (
+    ARRAY,
+    SMALLINT,
+    Boolean,
+    Column,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    String,
+    UniqueConstraint,
+)
 
 from medrekk.database.connection import Base
 from medrekk.utils import shortid
@@ -32,6 +43,31 @@ class PatientProfile(Base, PatientBase):
     address_line2 = Column(String, nullable=True)
     religion = Column(String, nullable=False)
 
+class PatientAppointments(Base, PatientBase):
+    __tablename__ = "patient_appointments"
+
+    patient_id = Column(ForeignKey("patient_profile.id"))
+    appointment_date = Column(Date, nullable=False)
+
+class PatientVisit(Base, PatientBase):
+    __tablename__ = "patient_visits"
+
+    patient_id = Column(ForeignKey("patient_profile.id"))
+    appointment_id = Column(ForeignKey("patient_appointments.id"))
+    visit_date = Column(Date, nullable=False)
+
+    __table_args__ = (
+        Index("idx_patient_visit", "patient_id", "visit_date"),
+        UniqueConstraint("patient_id", "visit_date", name="uc_patient_visit"),
+    )
+
+class PatientRecord(Base, PatientBase):
+    __tablename__ = "patient_records"
+
+    patient_id = Column(ForeignKey("patient_profile.id"))
+    chief_complaint = Column(ARRAY(String))
+    
+
 
 # Patient Vitals:
 #   PatientBloodPressure,
@@ -42,23 +78,40 @@ class PatientBloodPressure(Base, PatientBase):
     __tablename__ = "patient_blood_pressure"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
+    dt_measured = Column(DateTime)
     systolic = Column(SMALLINT)
     diastolic = Column(SMALLINT)
+
+    __table_args__ = (
+        UniqueConstraint("patient_id", "dt_measured", name="uc_bloodpressure_patient_dt"),
+        Index("idx_bloodpressure_patient_dt", "patient_id", "dt_measured"),
+    )
 
 
 class PatientHeartRate(Base, PatientBase):
     __tablename__ = "patient_heart_rate"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
+    dt_measured = Column(DateTime)
     heart_rate = Column(SMALLINT)
+
+    __table_args__ = (
+        UniqueConstraint("patient_id", "dt_measured", name="uc_heartrate_patient_dt"),
+        Index("idx_heartrate_patient_dt", "patient_id", "dt_measured"),
+    )
 
 
 class PatientRespiratoryRate(Base, PatientBase):
     __tablename__ = "patient_respiratory_rate"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
+    dt_measured = Column(DateTime)
     respiratory_rate = Column(SMALLINT)
 
+    __table_args__ = (
+        UniqueConstraint("patient_id", "dt_measured", name="uc_respiratoryrate_patient_dt"),
+        Index("idx_respiratoryrate_patient_dt", "patient_id", "dt_measured"),
+    )
 
 class PatientBodyTemperature(Base, PatientBase):
     __tablename__ = "patient_body_temperature"

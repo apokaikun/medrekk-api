@@ -65,15 +65,15 @@ class PatientBloodPressureDelete(BaseModel):
 
 
 class PatientHeartRateCreate(BaseModel):
-    patient_id: str
-    hear_rate: int
+    dt_measured: datetime
+    heart_rate: int
 
 
 class PatientHeartRateRead(PatientHeartRateCreate, PatientBase):
     pass
 
 
-class PatientHeartRateUpdate(PatientBloodPressureCreate):
+class PatientHeartRateUpdate(PatientHeartRateCreate):
     updated: datetime = datetime.now()
 
 

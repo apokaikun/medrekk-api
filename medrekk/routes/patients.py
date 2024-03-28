@@ -5,22 +5,31 @@ from sqlalchemy.orm import Session
 
 from medrekk.controllers import (
     create_patient,
-    read_patients,
-    read_patient,
     create_patient_bloodpressure,
-    read_patient_bloodpressures,
-    read_patient_bloodpressure,
-    update_patient_bloodpressure,
+    create_patient_heartrate,
     delete_patient_bloodpressure,
+    delete_patient_heartrate,
+    read_patient,
+    read_patient_bloodpressure,
+    read_patient_bloodpressures,
+    read_patient_heartrate,
+    read_patient_heartrates,
+    read_patients,
+    update_patient_bloodpressure,
+    update_patient_heartrate,
 )
 from medrekk.database.connection import get_db
 from medrekk.schemas import (
+    PatientBloodPressureCreate,
+    PatientBloodPressureDelete,
+    PatientBloodPressureRead,
+    PatientBloodPressureUpdate,
+    PatientHeartRateCreate,
+    PatientHeartRateDelete,
+    PatientHeartRateRead,
+    PatientHeartRateUpdate,
     PatientProfileCreate,
     PatientProfileRead,
-    PatientBloodPressureRead,
-    PatientBloodPressureCreate,
-    PatientBloodPressureUpdate,
-    PatientBloodPressureDelete,
 )
 from medrekk.utils.auth import verify_jwt_token
 
@@ -99,6 +108,9 @@ async def delete_patient(
     pass
 
 
+# START: Blood Pressure
+
+
 @patient_routes.post(
     "/{patient_id}/bloodpressure/",
     response_model=PatientBloodPressureRead,
@@ -112,6 +124,7 @@ async def add_patient_bp(
     new_bp = create_patient_bloodpressure(patient_id, patient_bp, db)
 
     return PatientBloodPressureRead.model_validate(new_bp)
+
 
 @patient_routes.get(
     "/{patient_id}/bloodpressure/",
@@ -130,10 +143,11 @@ def get_bloodpressures(
 
     return validated
 
+
 @patient_routes.get(
     "/{patient_id}/bloodpressure/{bp_id}/",
     response_model=PatientBloodPressureRead,
-    name="Get Patient Blood Pressure"
+    name="Get Patient Blood Pressure",
 )
 def get_bloodpressure(
     patient_id: str,
@@ -144,10 +158,11 @@ def get_bloodpressure(
 
     return PatientBloodPressureRead.model_validate(patient_bp)
 
+
 @patient_routes.put(
     "/{patient_id}/bloodpressure/{bp_id}",
     response_model=PatientBloodPressureRead,
-    name="Update Blood Pressure Record"
+    name="Update Blood Pressure Record",
 )
 def put_bloodpressure(
     patient_id: str,
@@ -163,3 +178,98 @@ def put_bloodpressure(
     )
 
     return PatientBloodPressureRead.model_validate(patient_bp)
+
+
+@patient_routes.delete(
+    "/{patient_id}/bloodpressure/{bp_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_bloodpressure(
+    patient_id: str,
+    bp_id: str,
+    db: Annotated[Session, Depends(get_db)],
+):
+    return delete_patient_bloodpressure(patient_id, bp_id, db)
+
+
+# END : Blood Pressure
+
+# START: Heart Rate
+
+
+@patient_routes.post(
+    "/{patient_id}/heartrate/",
+    response_model=PatientHeartRateRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_patient_heartrate(
+    patient_id: str,
+    heartrate: PatientHeartRateCreate,
+    db: Annotated[Session, Depends(get_db)],
+):
+    new_heartrate = create_patient_heartrate(patient_id, heartrate, db)
+
+    return PatientHeartRateRead.model_validate(new_heartrate)
+
+
+@patient_routes.get(
+    "/{patient_id}/heartrate/",
+    response_model=List[PatientHeartRateRead],
+    name="Get Patient Heart Rates",
+)
+async def get_patient_heartrates(
+    patient_id: str,
+    db: Annotated[Session, Depends(get_db)],
+):
+    patient_heartrates = read_patient_heartrates(patient_id, db)
+
+    return [
+        PatientHeartRateRead.model_validate(heartrate)
+        for heartrate in patient_heartrates
+    ]
+
+
+@patient_routes.get(
+    "/{patient_id}/heartrate/{heartrate_id}/",
+    response_model=PatientHeartRateRead,
+    name="Get Patient Heart Rate",
+)
+async def get_patient_heartrate(
+    patient_id: str,
+    heartrate_id: str,
+    db: Annotated[Session, Depends(get_db)],
+):
+    patient_heartrate = read_patient_heartrate(patient_id, heartrate_id, db)
+
+    return PatientHeartRateRead.model_validate(patient_heartrate)
+
+
+@patient_routes.put(
+    "/{patient_id}/heartrate/{heartrate_id}/",
+    response_model=PatientHeartRateRead,
+    name="Update Patient Heart Rate",
+)
+async def put_patient_heartrate(
+    patient_id: str,
+    heartrate_id: str,
+    heartrate: PatientHeartRateUpdate,
+    db: Annotated[Session, Depends(get_db)],
+):
+    updated_heartrate = update_patient_heartrate(
+        patient_id, heartrate_id, heartrate, db
+    )
+
+    return PatientHeartRateRead.model_validate(updated_heartrate)
+
+
+@patient_routes.delete(
+    "/{patient_id}/heartrate/{heartrate_id}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    name="Delete Patient Heart Rate",
+)
+async def delete_heartrate(
+    patient_id: str,
+    heartrate_id: str,
+    db: Annotated[Session, Depends(get_db)],
+):
+    return delete_patient_heartrate(patient_id, heartrate_id, db)
