@@ -1,13 +1,23 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, Field, SecretStr
-
-from medrekk.schemas.base import MedRekkBaseSchema
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, SecretStr
 
 
-# MedRekk User Schemas
-class UserBase(BaseModel):
+class MedRekkBaseSchema(BaseModel):
+    id: str
+    created: datetime
+    updated: datetime
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        validate_assignment=True,
+        arbitrary_types_allowed=True,
+    )
+
+
+# MedRekk Member Schemas
+class MemberBase(BaseModel):
     """
     usernames are required to be emails for easy verification.
     """
@@ -15,31 +25,36 @@ class UserBase(BaseModel):
     username: EmailStr = Field(description="Must be email.")
 
 
-class UserCreate(UserBase):
+class MemberCreate(MemberBase):
     password: SecretStr
 
 
-class UserRead(UserBase, MedRekkBaseSchema):
+class MemberRead(MemberBase, MedRekkBaseSchema):
+    account_id: str
     active: bool
-    memberships: List["AccountMembership"]
-    profile: Optional["UserProfileRead"]
 
-class UserUpdate(UserCreate, UserRead):
+
+class MemberUpdate(MemberCreate, MemberRead):
     updated: datetime
 
-class UserListItem(UserBase, MedRekkBaseSchema):
+
+class MemberListItem(MemberBase, MedRekkBaseSchema):
     pass
 
-class Users(BaseModel):
-    users: List["UserListItem"]
+
+class Members(BaseModel):
+    users: List["MemberListItem"]
+
 
 # MedRekk Account Schemas
-class AccountMembersRead(UserBase, MedRekkBaseSchema):
+class AccountMembersRead(MemberBase, MedRekkBaseSchema):
     active: bool
 
 
 class AccountCreate(BaseModel):
     account_name: str
+    user_name: EmailStr
+    password: SecretStr
 
 
 class AccountUpdate(BaseModel):
@@ -47,12 +62,12 @@ class AccountUpdate(BaseModel):
     updated: datetime
 
 
-class AccountRead(AccountCreate, MedRekkBaseSchema):
+class AccountRead(MedRekkBaseSchema):
+    account_name: str
+    account_subdomain: str    
     owner_id: str
     status: int
     trial_ends_at: datetime
-    owner: "AccountMembersRead"
-    members: List["AccountMembersRead"]
 
 
 class AccountMembership(AccountCreate, MedRekkBaseSchema):
@@ -61,14 +76,14 @@ class AccountMembership(AccountCreate, MedRekkBaseSchema):
     trial_ends_at: datetime
 
 
-# MedRekk User Profile Schemas
+# MedRekk Member Profile Schemas
 
 
 class ProfileBase(BaseModel):
     pass
 
 
-class ProfileUserRead(AccountMembersRead):
+class ProfileMemberRead(AccountMembersRead):
     pass
 
 
@@ -94,9 +109,9 @@ class ProfileUpdate(ProfileCreate):
 
 
 class ProfileRead(MedRekkBaseSchema, ProfileCreate):
-    user: "ProfileUserRead"
+    user: "ProfileMemberRead"
 
 
-class UserProfileRead(MedRekkBaseSchema, ProfileCreate):
+class MemberProfileRead(MedRekkBaseSchema, ProfileCreate):
     user_id: str
     pass

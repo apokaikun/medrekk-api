@@ -1,16 +1,30 @@
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+<<<<<<< HEAD
 from medrekk.controllers.accounts import create_account, read_account, read_accounts
+=======
+from medrekk.controllers.accounts import create_account, read_account
+>>>>>>> 25c02d6 (refactor)
 from medrekk.database.connection import get_db
-from medrekk.schemas import AccountCreate, AccountRead
+from medrekk.schemas.accounts import AccountCreate, AccountRead
 from medrekk.schemas.responses import HTTP_EXCEPTION
+<<<<<<< HEAD
 from medrekk.utils.auth import get_user_id, verify_jwt_token
 from medrekk.utils import routes
 
 account_routes = APIRouter(prefix=f"/{routes.ACCOUNTS}", tags=["Accounts"])
+=======
+from medrekk.utils import routes
+from medrekk.utils.auth import get_account_id, get_member_id, verify_jwt_token
+
+account_routes = APIRouter(
+    prefix=f"/{routes.ACCOUNTS}",
+    tags=["Accounts"],
+)
+>>>>>>> 25c02d6 (refactor)
 
 
 @account_routes.post(
@@ -31,15 +45,13 @@ account_routes = APIRouter(prefix=f"/{routes.ACCOUNTS}", tags=["Accounts"])
 )
 async def new_account(
     account: AccountCreate,
-    user_id: Annotated[str, Depends(get_user_id)],
     db: Annotated[Session, Depends(get_db)],
 ):
-
-    new_account = create_account(account, user_id, db)
-
-    return new_account
+    new_account = create_account(account, db)
+    return AccountRead.model_validate(new_account)
 
 
+<<<<<<< HEAD
 account_routes_verified = APIRouter(prefix=f"/{routes.ACCOUNTS}", dependencies=[Depends(verify_jwt_token)], tags=["Accounts Verified"])
 @account_routes_verified.get(
     "/",
@@ -59,18 +71,33 @@ async def get_accounts(
 
 @account_routes_verified.get(
     "/{account_id}/",
+=======
+account_routes_verified = APIRouter(
+    prefix=f"/{routes.ACCOUNTS}",
+    dependencies=[Depends(verify_jwt_token)],
+    tags=["Accounts Verified"],
+)
+
+
+@account_routes_verified.get(
+    "/",
+>>>>>>> 25c02d6 (refactor)
     response_model=AccountRead,
 )
 async def get_account(
-    account_id: str,
-    user_id: Annotated[str, Depends(get_user_id)],
+    account_id: Annotated[str, Depends(get_account_id)],
+    member_id: Annotated[str, Depends(get_member_id)],
     db: Annotated[Session, Depends(get_db)],
 ):
-    account = read_account(account_id, user_id, db)
+    account = read_account(account_id, member_id, db)
     return account
 
 
+<<<<<<< HEAD
 @account_routes_verified.put("/{account_id}", response_model=AccountRead)
+=======
+@account_routes_verified.put("/", response_model=AccountRead)
+>>>>>>> 25c02d6 (refactor)
 async def set_account():
     pass
 

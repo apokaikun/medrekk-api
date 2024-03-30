@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
@@ -84,3 +85,5 @@ __all__ = [
     "PatientBodyTemperatureUpdate",
     "PatientBodyTemperatureDelete",
 ]
+=======
+>>>>>>> 25c02d6 (refactor)

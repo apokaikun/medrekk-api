@@ -1,7 +1,7 @@
 import hmac
 import re
 from datetime import datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Optional
 
 import bcrypt
 import shortuuid
@@ -11,16 +11,27 @@ from jose.constants import ALGORITHMS
 
 from medrekk.database.token import token_store
 from medrekk.dependencies import oauth2_scheme
+<<<<<<< HEAD
 from medrekk.schemas import UserRead
 from medrekk.schemas.token import Token
 
 from .constants import HMAC_KEY, JWT_KEY, TOKEN_EXPIRE_MINUTES
+=======
+from medrekk.schemas.accounts import MemberRead
+from medrekk.schemas.token import Token
+from medrekk.models.medrekk import MedRekkAccount
+from .constants import HMAC_KEY, JWT_KEY, TOKEN_EXPIRE_MINUTES
 
 
-def generate_access_token(user: UserRead) -> Token:
+def generate_access_token(member: MemberRead, account: Optional[MedRekkAccount] = None) -> Token:
+    
+    account_id = account.id if account else member.account_id
+>>>>>>> 25c02d6 (refactor)
+
+
     iat = datetime.now()
     exp = iat + timedelta(minutes=TOKEN_EXPIRE_MINUTES)
-    sub = user.id
+    sub = f"{member.id},{account_id}"
     jti = shortuuid.uuid()
     claims = {"sub": sub, "iat": iat, "exp": exp, "jti": jti}
     to_join = [str(i) for i in claims.values()]
@@ -52,11 +63,16 @@ def verify_jwt_token(token: Annotated[str, Depends(oauth2_scheme)]) -> bool:
         )
 
 
-def get_user_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
+def get_member_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     unverified = jwt.get_unverified_claims(token)
     sub: str = unverified["sub"]
+<<<<<<< HEAD
     user_id = sub.split(",")[0]
     return user_id
+=======
+    member_id = sub.split(",")[0]
+    return member_id
+>>>>>>> 25c02d6 (refactor)
 
 
 def get_account_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
@@ -66,14 +82,18 @@ def get_account_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     return account_id
 
 
+<<<<<<< HEAD
 def check_self(token: Annotated[str, Depends(oauth2_scheme)], user_id: str):
+=======
+def check_self(token: Annotated[str, Depends(oauth2_scheme)], member_id: str):
+>>>>>>> 25c02d6 (refactor)
     unverified = jwt.get_unverified_claims(token)
     sub = unverified.get("sub")
-    if sub != user_id:
+    if sub != member_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized."
         )
-    return sub == user_id
+    return sub == member_id
 
 
 def validate_password_strength(password):

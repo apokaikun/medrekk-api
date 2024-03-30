@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from .accounts import create_account, read_account, read_accounts
 from .patient_bloodpressure import (
     create_patient_bloodpressure,
@@ -61,3 +62,5 @@ __all__ = [
     "create_bodytemperature",
     "read_bodytemperatures",
 ]
+=======
+>>>>>>> 25c02d6 (refactor)

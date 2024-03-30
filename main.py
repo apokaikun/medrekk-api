@@ -5,11 +5,17 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+<<<<<<< HEAD
 from medrekk.controllers.members import authenticate_user
+=======
+# from medrekk.controllers.users import authenticate_user
+>>>>>>> 25c02d6 (refactor)
 from medrekk.database.connection import get_db
-from medrekk.routes import *
-from medrekk.schemas.responses import HTTP_EXCEPTION
-from medrekk.schemas.token import Token
+from medrekk.routes.accounts import account_routes, account_routes_verified
+from medrekk.routes.auth import auth_routes
+from medrekk.routes.members import member_routes
+# from medrekk.schemas.responses import HTTP_EXCEPTION
+# from medrekk.schemas.token import Token
 from medrekk.utils.auth import generate_access_token
 
 VERSION = "202403"
@@ -30,6 +36,7 @@ def root():
     # Redirects to docs URL for easier testing.
     return RedirectResponse(url=DOCS_URL)
 
+<<<<<<< HEAD
 
 @medrekk_app.post(
     f"/{VERSION}-{VERSION_SUFFIX}/auth",
@@ -62,3 +69,9 @@ def auth(
 medrekk_app.include_router(profile_routes)
 medrekk_app.include_router(patient_routes)
 medrekk_app.include_router(bodytemperature_routes)
+=======
+medrekk_app.include_router(auth_routes)
+medrekk_app.include_router(account_routes)
+medrekk_app.include_router(account_routes_verified)
+medrekk_app.include_router(member_routes)
+>>>>>>> 25c02d6 (refactor)

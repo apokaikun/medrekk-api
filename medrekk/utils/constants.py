@@ -7,3 +7,9 @@ HMAC_KEY = "I7_4GWhJJLIA8HbTZuPfMKoA6ltWSqU6r2NaQ7mGTuzOErox90eVCRHL1Obp6EIbNmr-
 TOKEN_EXPIRE_MINUTES = 60
 
 
+<<<<<<< HEAD
+=======
+VERSION = "202403"
+VERSION_SUFFIX = "pre-alpha"
+DOCS_URL = f"/{VERSION}-{VERSION_SUFFIX}/docs"
+>>>>>>> 25c02d6 (refactor)
