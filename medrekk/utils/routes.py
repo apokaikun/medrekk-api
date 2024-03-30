@@ -1,9 +1,6 @@
 ACCOUNTS = "accounts"
 MEMBERS = "members"
-<<<<<<< HEAD
-=======
 PROFILES = "profiles"
->>>>>>> 25c02d6 (refactor)
 VISITS = "visits"
 APPOINTMENTS = "appointments"
 RECORDS = "records"

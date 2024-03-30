@@ -5,11 +5,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-<<<<<<< HEAD
-from medrekk.controllers.members import authenticate_user
-=======
 # from medrekk.controllers.users import authenticate_user
->>>>>>> 25c02d6 (refactor)
 from medrekk.database.connection import get_db
 from medrekk.routes.accounts import account_routes, account_routes_verified
 from medrekk.routes.auth import auth_routes
@@ -36,42 +32,7 @@ def root():
     # Redirects to docs URL for easier testing.
     return RedirectResponse(url=DOCS_URL)
 
-<<<<<<< HEAD
-
-@medrekk_app.post(
-    f"/{VERSION}-{VERSION_SUFFIX}/auth",
-    response_model=Token,
-    status_code=200,
-    description="Successful username and password authentication.",
-    responses={
-        401: {
-            "description": "This message indicates that you tried to access a resource that requires authorization, but your credentials (username and password) were not recognized by the server.",
-            "model": HTTP_EXCEPTION,
-        },
-        500: {
-            "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-            "model": HTTP_EXCEPTION,
-        },
-    },
-)
-def auth(
-    user_form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Annotated[Session, Depends(get_db)],
-) -> Token:
-    user = authenticate_user(db, user_form_data)
-    access_token = generate_access_token(user)
-    return {"access_token": access_token, "token_type": "bearer"}
-
-
-# medrekk_app.include_router(account_routes)
-# medrekk_app.include_router(account_routes_verified)
-# medrekk_app.include_router(member_routes_verified)
-medrekk_app.include_router(profile_routes)
-medrekk_app.include_router(patient_routes)
-medrekk_app.include_router(bodytemperature_routes)
-=======
 medrekk_app.include_router(auth_routes)
 medrekk_app.include_router(account_routes)
 medrekk_app.include_router(account_routes_verified)
 medrekk_app.include_router(member_routes)
->>>>>>> 25c02d6 (refactor)

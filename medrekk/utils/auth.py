@@ -11,12 +11,6 @@ from jose.constants import ALGORITHMS
 
 from medrekk.database.token import token_store
 from medrekk.dependencies import oauth2_scheme
-<<<<<<< HEAD
-from medrekk.schemas import UserRead
-from medrekk.schemas.token import Token
-
-from .constants import HMAC_KEY, JWT_KEY, TOKEN_EXPIRE_MINUTES
-=======
 from medrekk.schemas.accounts import MemberRead
 from medrekk.schemas.token import Token
 from medrekk.models.medrekk import MedRekkAccount
@@ -26,7 +20,6 @@ from .constants import HMAC_KEY, JWT_KEY, TOKEN_EXPIRE_MINUTES
 def generate_access_token(member: MemberRead, account: Optional[MedRekkAccount] = None) -> Token:
     
     account_id = account.id if account else member.account_id
->>>>>>> 25c02d6 (refactor)
 
 
     iat = datetime.now()
@@ -66,13 +59,8 @@ def verify_jwt_token(token: Annotated[str, Depends(oauth2_scheme)]) -> bool:
 def get_member_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     unverified = jwt.get_unverified_claims(token)
     sub: str = unverified["sub"]
-<<<<<<< HEAD
-    user_id = sub.split(",")[0]
-    return user_id
-=======
     member_id = sub.split(",")[0]
     return member_id
->>>>>>> 25c02d6 (refactor)
 
 
 def get_account_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
@@ -82,11 +70,7 @@ def get_account_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     return account_id
 
 
-<<<<<<< HEAD
-def check_self(token: Annotated[str, Depends(oauth2_scheme)], user_id: str):
-=======
 def check_self(token: Annotated[str, Depends(oauth2_scheme)], member_id: str):
->>>>>>> 25c02d6 (refactor)
     unverified = jwt.get_unverified_claims(token)
     sub = unverified.get("sub")
     if sub != member_id:
