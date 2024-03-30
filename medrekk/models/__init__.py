@@ -1,7 +1,7 @@
 from .medrekk import (
     MedRekkAccount,
-    MedRekkUser,
-    MedRekkUserProfile,
+    MedRekkMember,
+    MedRekkMemberProfile,
     MedRekkBase,
 )
 
@@ -24,8 +24,8 @@ from .patient import (
 
 __all__ = [
     "MedRekkAccount",
-    "MedRekkUser",
-    "MedRekkUserProfile",
+    "MedRekkMember",
+    "MedRekkMemberProfile",
     "MedRekkBase",
     "PatientProfile",
     "PatientBloodPressure",

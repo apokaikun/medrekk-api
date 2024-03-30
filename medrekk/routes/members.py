@@ -9,13 +9,16 @@ from medrekk.controllers import create_user, read_user, read_users
 from medrekk.database.connection import get_db
 from medrekk.schemas import UserCreate, UserRead, UserListItem
 from medrekk.schemas.responses import HTTP_EXCEPTION
+from medrekk.utils import routes
 from medrekk.utils.auth import check_self, verify_jwt_token
 
-user_routes = APIRouter()
+member_routes_verified = APIRouter(
+    prefix=f"/{routes.ACCOUNTS}", dependencies=[Depends(verify_jwt_token)]
+)
 
 
-@user_routes.post(
-    "/users/",
+@member_routes_verified.post(
+    "/{account_id}/members/",
     response_model=UserRead,
     status_code=201,
     responses={
@@ -29,8 +32,9 @@ user_routes = APIRouter()
         },
     },
 )
-async def register(
-    user_form_data: UserCreate,
+async def add_member(
+    account_id: str,
+    member_data: UserCreate,
     db: Annotated[Session, Depends(get_db)],
 ):
     """
@@ -41,7 +45,7 @@ async def register(
 
 
     """
-    user = create_user(user_form_data, db)
+    user = add_account_member(account_id, member_data, db)
     if user is None:
         raise JSONResponse(
             content="HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
@@ -53,32 +57,35 @@ async def register(
 """
 Routes that requires a valid jwt_token
 """
-user_routes_verified = APIRouter(dependencies=[Depends(verify_jwt_token)])
 
 
-@user_routes_verified.get(
-    "/users/",
+@member_routes_verified.get(
+    "/{account_id}/members/",
     response_model=List[UserListItem],
 )
-async def get_users(db: Annotated[Session, Depends(get_db)]):
+async def get_members(
+    account_id: str,
+    db: Annotated[Session, Depends(get_db)],
+):
     """
     Get all users.
     """
-    users = read_users(db)
+    users = read_users(account_id, db)
 
     return [UserListItem.model_validate(user) for user in users]
 
 
 # Get a specific user by user ID
-@user_routes_verified.get(
-    "/users/{user_id}",
+@member_routes_verified.get(
+    "/{account_id}/members/{member_id}",
     response_model=UserRead,
 )
 async def get_user(
-    user_id: str,
+    account_id: str,
+    member_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    user = read_user(user_id, db)
+    user = read_user(account_id, member_id, db)
 
     return UserRead.model_validate(user)
 
@@ -87,16 +94,17 @@ async def get_user(
 # TODO: Add a scope based authorization to add a 'delete user' scope to delete other than self.
 
 
-@user_routes_verified.delete(
-    "/users/{user_id}",
+@member_routes_verified.delete(
+    "/{account_id}/members/{member_id}",
     response_model=UserRead,
     dependencies=[Depends(check_self)],
 )
 async def delete_user(
-    user_id: str,
+    account_id: str,
+    member_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    user = read_user(user_id, db)
+    user = read_user(account_id, member_id, db)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 

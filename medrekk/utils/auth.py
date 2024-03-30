@@ -9,11 +9,12 @@ from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from jose.constants import ALGORITHMS
 
+from medrekk.database.token import token_store
 from medrekk.dependencies import oauth2_scheme
 from medrekk.schemas import UserRead
 from medrekk.schemas.token import Token
-from medrekk.database.token import token_store
-from .constants import HMAC_KEY, JWT_KEY, jwts_, TOKEN_EXPIRE_MINUTES
+
+from .constants import HMAC_KEY, JWT_KEY, TOKEN_EXPIRE_MINUTES
 
 
 def generate_access_token(user: UserRead) -> Token:
@@ -30,7 +31,6 @@ def generate_access_token(user: UserRead) -> Token:
 
     claims["aud"] = aud
 
-    # jwts_[jti] = aud
     token_store.set_token(jti=jti, aud=aud)
 
     token = jwt.encode(claims, JWT_KEY, algorithm=ALGORITHMS.HS256)
@@ -41,9 +41,8 @@ def generate_access_token(user: UserRead) -> Token:
 def verify_jwt_token(token: Annotated[str, Depends(oauth2_scheme)]) -> bool:
     unverified = jwt.get_unverified_claims(token)
     jti = unverified["jti"]
-    aud = jwts_.get(jti)
     aud = token_store.get_token(jti=jti)
-    # If verification fails, jwterror is raised.
+
     try:
         return jwt.decode(token, JWT_KEY, algorithms=ALGORITHMS.HS256, audience=aud)
     except JWTError:
@@ -55,8 +54,16 @@ def verify_jwt_token(token: Annotated[str, Depends(oauth2_scheme)]) -> bool:
 
 def get_user_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     unverified = jwt.get_unverified_claims(token)
-    user_id = unverified["sub"]
+    sub: str = unverified["sub"]
+    user_id = sub.split(",")[0]
     return user_id
+
+
+def get_account_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
+    unverified = jwt.get_unverified_claims(token)
+    sub: str = unverified["sub"]
+    account_id = sub.split(",")[1]
+    return account_id
 
 
 def check_self(token: Annotated[str, Depends(oauth2_scheme)], user_id: str):

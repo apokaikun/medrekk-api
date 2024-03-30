@@ -3,14 +3,14 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from medrekk.controllers.accounts import (create_account, read_account,
-                                          read_accounts)
+from medrekk.controllers.accounts import create_account, read_account, read_accounts
 from medrekk.database.connection import get_db
 from medrekk.schemas import AccountCreate, AccountRead
 from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.utils.auth import get_user_id, verify_jwt_token
+from medrekk.utils import routes
 
-account_routes = APIRouter(prefix="/accounts", dependencies=[Depends(verify_jwt_token)])
+account_routes = APIRouter(prefix=f"/{routes.ACCOUNTS}", tags=["Accounts"])
 
 
 @account_routes.post(
@@ -40,7 +40,11 @@ async def new_account(
     return new_account
 
 
-@account_routes.get("/", response_model=List[AccountRead])
+account_routes_verified = APIRouter(prefix=f"/{routes.ACCOUNTS}", dependencies=[Depends(verify_jwt_token)], tags=["Accounts Verified"])
+@account_routes_verified.get(
+    "/",
+    response_model=List[AccountRead],
+)
 async def get_accounts(
     user_id: Annotated[str, Depends(get_user_id)],
     db: Annotated[Session, Depends(get_db)],
@@ -53,7 +57,10 @@ async def get_accounts(
     return validated_accounts
 
 
-@account_routes.get("/{account_id}", response_model=AccountRead)
+@account_routes_verified.get(
+    "/{account_id}/",
+    response_model=AccountRead,
+)
 async def get_account(
     account_id: str,
     user_id: Annotated[str, Depends(get_user_id)],
@@ -63,6 +70,11 @@ async def get_account(
     return account
 
 
-@account_routes.put("/{account_id}", response_model=AccountRead)
+@account_routes_verified.put("/{account_id}", response_model=AccountRead)
 async def set_account():
     pass
+
+
+# @account_routes.post(
+#     "/accounts/{account_id}/members/"
+#     )

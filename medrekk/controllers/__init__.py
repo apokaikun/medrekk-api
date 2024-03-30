@@ -20,9 +20,14 @@ from .patient_respiratory import (
     read_respiratory,
     update_respiratory,
 )
+
+from .patient_bodytemperature import (
+    create_bodytemperature,
+    read_bodytemperatures,
+)
 from .patients import create_patient, read_patient, read_patients, update_patient
 from .profiles import create_profile, read_profile
-from .users import create_user, read_user, read_user_by_username, read_users
+from .members import add_account_member, read_member, read_member_by_username, read_members, update_member, delete_user
 
 __all__ = [
     "create_user",
@@ -53,4 +58,6 @@ __all__ = [
     "read_respiratory",
     "update_respiratory",
     "delete_repiratory",
+    "create_bodytemperature",
+    "read_bodytemperatures",
 ]

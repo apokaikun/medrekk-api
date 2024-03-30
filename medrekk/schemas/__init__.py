@@ -32,6 +32,10 @@ from .patients import (
     PatientRespiratoryRateDelete,
     PatientRespiratoryRateRead,
     PatientRespiratoryRateUpdate,
+    PatientBodyTemperatureCreate,
+    PatientBodyTemperatureRead,
+    PatientBodyTemperatureUpdate,
+    PatientBodyTemperatureDelete,
 )
 
 
@@ -75,4 +79,8 @@ __all__ = [
     "PatientRespiratoryRateRead",
     "PatientRespiratoryRateUpdate",
     "PatientRespiratoryRateDelete",
+    "PatientBodyTemperatureCreate",
+    "PatientBodyTemperatureRead",
+    "PatientBodyTemperatureUpdate",
+    "PatientBodyTemperatureDelete",
 ]

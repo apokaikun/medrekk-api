@@ -17,7 +17,7 @@ def authenticate_user(
     db: Session,
     user_form_data: OAuth2PasswordRequestForm,
 ) -> UserRead:
-    user = read_user_by_username(db, user_form_data.username)
+    user = read_member_by_username(db, user_form_data.username)
     
     if not verify_password(user.password, user_form_data.password):
         raise HTTPException(
@@ -34,7 +34,7 @@ def authenticate_user(
     return UserRead.model_validate(user)
 
 
-def create_user(
+def add_account_member(
     user_form_data: UserCreate,
     db: Session,
 ) -> UserRead:
@@ -89,7 +89,7 @@ def create_user(
         )
 
 
-def read_user(user_id: int, db: Session) -> MedRekkUser:
+def read_member(user_id: int, db: Session) -> MedRekkUser:
     try:
         user = db.get(MedRekkUser, user_id)
 
@@ -120,7 +120,7 @@ def read_user(user_id: int, db: Session) -> MedRekkUser:
         )
 
 
-def read_user_by_username(db: Session, username: str) -> MedRekkUser:
+def read_member_by_username(db: Session, username: str) -> MedRekkUser:
     try:
         select_stmt = select(MedRekkUser).where(MedRekkUser.username == username)
         user = db.scalars(select_stmt).first()
@@ -150,7 +150,7 @@ def read_user_by_username(db: Session, username: str) -> MedRekkUser:
         )
 
 
-def read_users(db: Session) -> List[MedRekkUser]:
+def read_members(db: Session) -> List[MedRekkUser]:
     try:
         # select_stmt = select(MedRekkUser)
         # users = db.scalars(select_stmt).all()
@@ -168,7 +168,7 @@ def read_users(db: Session) -> List[MedRekkUser]:
         )
 
 
-def update_user(db: Session, user_id: int, user: UserUpdate):
+def update_member(db: Session, user_id: int, user: UserUpdate):
 
     db_user = db.query(UserCreate).filter(UserCreate.id == user_id).first()
     for field, value in user.model_dump(exclude_unset=True).items():
@@ -180,7 +180,7 @@ def update_user(db: Session, user_id: int, user: UserUpdate):
     return db_user
 
 
-def delete_user(db: Session, user_id: int):
+def delete_member(db: Session, user_id: int):
     try:
         select_stmt = select(MedRekkUser).where(MedRekkUser.id == user_id)
         db_user = db.scalars(select_stmt).first()
