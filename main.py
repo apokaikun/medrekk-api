@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from medrekk.controllers.users import authenticate_user
+from medrekk.controllers.members import authenticate_user
 from medrekk.database.connection import get_db
 from medrekk.routes import *
 from medrekk.schemas.responses import HTTP_EXCEPTION
@@ -56,8 +56,9 @@ def auth(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-medrekk_app.include_router(user_routes)
-medrekk_app.include_router(user_routes_verified)
-medrekk_app.include_router(account_routes)
+# medrekk_app.include_router(account_routes)
+# medrekk_app.include_router(account_routes_verified)
+# medrekk_app.include_router(member_routes_verified)
 medrekk_app.include_router(profile_routes)
 medrekk_app.include_router(patient_routes)
+medrekk_app.include_router(bodytemperature_routes)
