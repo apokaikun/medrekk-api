@@ -6,7 +6,10 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.models.patient import PatientBloodPressure
-from medrekk.schemas.patients import PatientBloodPressureCreate, PatientBloodPressureUpdate
+from medrekk.schemas.patients import (
+    PatientBloodPressureCreate,
+    PatientBloodPressureUpdate,
+)
 from medrekk.utils import shortid
 
 
@@ -61,14 +64,13 @@ def create_patient_bloodpressure(
 
 
 def read_patient_bloodpressure(
-    patient_id: str,
+    record_id: str,
     bp_id: str,
     db: Session,
 ) -> PatientBloodPressure:
-
     patient_bp = (
         db.query(PatientBloodPressure)
-        .filter(PatientBloodPressure.patient_id == patient_id)
+        .filter(PatientBloodPressure.record_id == record_id)
         .filter(PatientBloodPressure.id == bp_id)
         .one_or_none()
     )
@@ -87,13 +89,13 @@ def read_patient_bloodpressure(
 
 
 def read_patient_bloodpressures(
-    patient_id: str,
+    record_id: str,
     db: Session,
 ) -> List[PatientBloodPressure]:
     try:
         patient_bps = (
             db.query(PatientBloodPressure)
-            .filter(PatientBloodPressure.patient_id == patient_id)
+            .filter(PatientBloodPressure.record_id == record_id)
             .order_by(PatientBloodPressure.created.desc())
             .all()
         )
@@ -111,13 +113,13 @@ def read_patient_bloodpressures(
 
 
 def update_patient_bloodpressure(
-    patient_id: str,
+    record_id: str,
     bp_id: str,
     bp: PatientBloodPressureUpdate,
     db: Session,
 ) -> PatientBloodPressure:
     try:
-        patient_bp = read_patient_bloodpressure(patient_id, bp_id, db)
+        patient_bp = read_patient_bloodpressure(record_id, bp_id, db)
 
         for field, value in bp.model_dump(exclude_unset=True).items():
             setattr(patient_bp, field, value)
@@ -140,12 +142,12 @@ def update_patient_bloodpressure(
 
 
 def delete_patient_bloodpressure(
-    patient_id: str,
+    record_id: str,
     bp_id: str,
     db: Session,
 ) -> None:
     try:
-        patient_bp = read_patient_bloodpressure(patient_id, bp_id, db)
+        patient_bp = read_patient_bloodpressure(record_id, bp_id, db)
 
         db.delete(patient_bp)
         db.commit()
