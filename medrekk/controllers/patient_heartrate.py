@@ -11,13 +11,13 @@ from medrekk.utils import shortid
 
 
 def create_patient_heartrate(
-    patient_id: str,
+    record_id: str,
     heartrate: PatientHeartRateCreate,
     db: Session,
 ) -> PatientHeartRate:
     try:
         new_heartrate = PatientHeartRate(**heartrate.model_dump())
-        new_heartrate.patient_id = patient_id
+        new_heartrate.record_id = record_id
         new_heartrate.id = shortid()
 
         db.add(new_heartrate)
@@ -41,13 +41,13 @@ def create_patient_heartrate(
 
 
 def read_patient_heartrate(
-    patient_id: str,
+    record_id: str,
     heartrate_id: str,
     db: Session,
 ) -> PatientHeartRate:
     patient_heartrate = (
         db.query(PatientHeartRate)
-        .filter(PatientHeartRate.patient_id == patient_id)
+        .filter(PatientHeartRate.record_id == record_id)
         .filter(PatientHeartRate.id == heartrate_id)
         .one_or_none()
     )
@@ -65,13 +65,13 @@ def read_patient_heartrate(
 
 
 def read_patient_heartrates(
-    patient_id: str,
+    record_id: str,
     db: Session,
 ) -> List[PatientHeartRate]:
     offset = 0
     patient_heartrates = (
         db.query(PatientHeartRate)
-        .filter(PatientHeartRate.patient_id == patient_id)
+        .filter(PatientHeartRate.record_id == record_id)
         .offset(offset)
         .limit(10)
         .all()
@@ -81,28 +81,14 @@ def read_patient_heartrates(
 
 
 def update_patient_heartrate(
-    patient_id: str,
+    record_id: str,
     heartrate_id: str,
     heartrate: PatientHeartRateUpdate,
     db: Session,
 ) -> PatientHeartRate:
-    patient_heartrate = (
-        db.query(PatientHeartRate)
-        .filter(PatientHeartRate.patient_id == patient_id)
-        .filter(PatientHeartRate.id == heartrate_id)
-        .one_or_none()
-    )
+    patient_heartrate = read_patient_heartrate(record_id, heartrate_id, db)
 
-    if not patient_heartrate:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={
-                "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": f"Heart rate data NOT FOUND."},
-            },
-        )
-
-    for field, value in heartrate.model_dump().items():
+    for field, value in heartrate.model_dump(exclude_unset=True).items():
         setattr(patient_heartrate, field, value)
 
     db.add(patient_heartrate)
@@ -113,11 +99,11 @@ def update_patient_heartrate(
 
 
 def delete_patient_heartrate(
-    patient_id: str,
+    record_id: str,
     heartrate_id: str,
     db: Session,
 ) -> None:
-    patient_heartrate = read_patient_heartrate(patient_id, heartrate_id, db)
+    patient_heartrate = read_patient_heartrate(record_id, heartrate_id, db)
 
     db.delete(patient_heartrate)
     db.commit()

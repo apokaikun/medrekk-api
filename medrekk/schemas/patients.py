@@ -1,6 +1,7 @@
-from datetime import datetime, date
+from datetime import datetime, date, timezone
+import time
 from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
 
 class PatientBase(BaseModel):
@@ -48,7 +49,10 @@ class PatientProfileDelete(BaseModel):
 
 
 class PatientBloodPressureCreate(BaseModel):
-    dt_measured: datetime
+    dt_measured: datetime = Field(
+        datetime,
+        examples=[time.strftime("%Y-%m-%d %H:%M", time.localtime())],
+    )
     systolic: int
     diastolic: int
 
@@ -66,7 +70,10 @@ class PatientBloodPressureDelete(BaseModel):
 
 
 class PatientHeartRateCreate(BaseModel):
-    dt_measured: datetime
+    dt_measured: AwareDatetime = Field(
+        datetime,
+        examples=[time.strftime("%Y-%m-%d %H:%M", time.localtime())],
+    )
     heart_rate: int
 
 
@@ -83,7 +90,7 @@ class PatientHeartRateDelete(BaseModel):
 
 
 class PatientRespiratoryRateCreate(BaseModel):
-    patient_id: str
+    dt_measured: datetime
     respiratory_rate: int
 
 
@@ -100,7 +107,6 @@ class PatientRespiratoryRateDelete(BaseModel):
 
 
 class PatientBodyTemperatureCreate(BaseModel):
-    patient_id: str
     dt_measured: datetime
     body_temperature: float
 
@@ -118,7 +124,7 @@ class PatientBodyTemperatureDelete(BaseModel):
 
 
 class PatientBodyWeightCreate(BaseModel):
-    patient_id: str
+    dt_measured: datetime
     body_weight: float
 
 
@@ -135,7 +141,7 @@ class PatientBodyWeightDelete(BaseModel):
 
 
 class PatientHeightCreate(BaseModel):
-    patient_id: str
+    dt_measured: datetime
     height: float
 
 
@@ -152,7 +158,7 @@ class PatientHeightDelete(BaseModel):
 
 
 class PatientBodyMassIndexCreate(BaseModel):
-    patient_id: str
+    dt_measured: datetime
     bmi: float
 
 
@@ -169,7 +175,6 @@ class PatientBodyMassIndexDelete(BaseModel):
 
 
 class PatientFamilyHistoryCreate(BaseModel):
-    patient_id: str
     hypertension: bool = False
     t2dm: bool = False
     asthma: bool = False
@@ -190,7 +195,6 @@ class PatientFamilyHistoryDelete(BaseModel):
 
 
 class PatientHospitalizationHistoryCreate(BaseModel):
-    patient_id: str
     chief_complaint: str
     admission_date: date
     discharge_date: date
@@ -212,7 +216,6 @@ class PatientHospitalizationHistoryDelete(BaseModel):
 
 
 class PatientMedicalHistoryCreate(BaseModel):
-    patient_id: str
     hypertension: bool = False
     t2dm: bool = False
     asthma: bool = False
@@ -233,7 +236,6 @@ class PatientMedicalHistoryDelete(BaseModel):
 
 
 class PatientMedicationCreate(BaseModel):
-    patient_id: str
     medication: str
     start_date: datetime
     end_date: Optional[datetime] = None
@@ -253,7 +255,6 @@ class PatientMedicationDelete(BaseModel):
 
 
 class PatientOBHistoryCreate(BaseModel):
-    patient_id: str
     gravida: int
     para: int
     term: int
@@ -277,7 +278,6 @@ class PatientOBHistoryDelete(BaseModel):
 
 
 class PatientSurgicalHistoryCreate(BaseModel):
-    patient_id: str
     chief_complaint: str
     surgery_date: date
     notes: List[str] = []
