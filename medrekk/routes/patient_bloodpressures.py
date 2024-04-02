@@ -16,10 +16,11 @@ from medrekk.schemas.patients import (
     PatientBloodPressureRead,
     PatientBloodPressureUpdate,
 )
-from medrekk.utils.auth import verify_jwt_token
+from medrekk.utils import routes
+from medrekk.utils.auth import is_account_record, verify_jwt_token
 
 bloodpressure_routes = APIRouter(
-    prefix="/patients",
+    prefix=f"/{routes.RECORDS}" + "/{record_id}",
     dependencies=[Depends(verify_jwt_token)],
     tags=["Patient Blood Pressure"],
 )
@@ -28,22 +29,22 @@ bloodpressure_routes = APIRouter(
 
 
 @bloodpressure_routes.post(
-    "/{patient_id}/bloodpressure/",
+    "/bloodpressure/",
     response_model=PatientBloodPressureRead,
     name="Add Patient Blood Pressure",
 )
 async def add_bloodpressure(
-    patient_id: str,
+    record_id: Annotated[str, Depends(is_account_record)],
     patient_bp: PatientBloodPressureCreate,
     db: Annotated[Session, Depends(get_db)],
 ):
-    new_bp = create_patient_bloodpressure(patient_id, patient_bp, db)
+    new_bp = create_patient_bloodpressure(record_id, patient_bp, db)
 
     return PatientBloodPressureRead.model_validate(new_bp)
 
 
 @bloodpressure_routes.get(
-    "/{patient_id}/bloodpressure/",
+    "/bloodpressure/",
     response_model=List[PatientBloodPressureRead],
     name="Get Patient Blood Pressure Records",
 )
@@ -61,7 +62,7 @@ def get_bloodpressures(
 
 
 @bloodpressure_routes.get(
-    "/{patient_id}/bloodpressure/{bp_id}/",
+    "/bloodpressure/{bp_id}/",
     response_model=PatientBloodPressureRead,
     name="Get Patient Blood Pressure",
 )
@@ -76,7 +77,7 @@ def get_bloodpressure(
 
 
 @bloodpressure_routes.put(
-    "/{patient_id}/bloodpressure/{bp_id}",
+    "/bloodpressure/{bp_id}",
     response_model=PatientBloodPressureRead,
     name="Update Blood Pressure Record",
 )
@@ -97,7 +98,7 @@ def put_bloodpressure(
 
 
 @bloodpressure_routes.delete(
-    "/{patient_id}/bloodpressure/{bp_id}",
+    "/bloodpressure/{bp_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_bloodpressure(

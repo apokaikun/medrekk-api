@@ -44,7 +44,6 @@ class PatientProfile(Base, PatientBase):
     address_line2 = Column(String, nullable=True)
     religion = Column(String, nullable=False)
 
-    body_temperatures:Mapped[List["PatientBodyTemperature"]] = relationship(backref='profile')
 
 class PatientAppointments(Base, PatientBase):
     __tablename__ = "patient_appointments"
@@ -74,6 +73,8 @@ class PatientRecord(Base, PatientBase):
     chief_complaint = Column(ARRAY(String))
     
     diagnosis: Mapped[List["PatientDiagnosis"]] = relationship(backref="record")
+    body_temperatures:Mapped[List["PatientBodyTemperature"]] = relationship(backref='record')
+
 
 class PatientDiagnosis(Base, PatientBase):
     __tablename__ = "patient_diagnosis"
@@ -90,55 +91,51 @@ class PatientDiagnosis(Base, PatientBase):
 class PatientBloodPressure(Base, PatientBase):
     __tablename__ = "patient_blood_pressure"
 
-    patient_id = Column(ForeignKey("patient_profile.id"))
     record_id = Column(ForeignKey("patient_records.id"))
     dt_measured = Column(DateTime)
     systolic = Column(SMALLINT)
     diastolic = Column(SMALLINT)
 
     __table_args__ = (
-        UniqueConstraint("patient_id", "dt_measured", name="uc_bloodpressure_patient_dt"),
-        Index("idx_bloodpressure_patient_dt", "patient_id", "dt_measured"),
+        UniqueConstraint("record_id", "dt_measured", name="uc_bloodpressure_patient_dt"),
+        Index("idx_bloodpressure_patient_dt", "record_id", "dt_measured"),
     )
 
 
 class PatientHeartRate(Base, PatientBase):
     __tablename__ = "patient_heart_rate"
 
-    patient_id = Column(ForeignKey("patient_profile.id"))
     record_id = Column(ForeignKey("patient_records.id"))
     dt_measured = Column(DateTime)
     heart_rate = Column(SMALLINT)
 
     __table_args__ = (
-        UniqueConstraint("patient_id", "dt_measured", name="uc_heartrate_patient_dt"),
-        Index("idx_heartrate_patient_dt", "patient_id", "dt_measured"),
+        UniqueConstraint("record_id", "dt_measured", name="uc_heartrate_patient_dt"),
+        Index("idx_heartrate_patient_dt", "record_id", "dt_measured"),
     )
 
 
 class PatientRespiratoryRate(Base, PatientBase):
     __tablename__ = "patient_respiratory_rate"
 
-    patient_id = Column(ForeignKey("patient_profile.id"))
     record_id = Column(ForeignKey("patient_records.id"))
     dt_measured = Column(DateTime)
     respiratory_rate = Column(SMALLINT)
 
     __table_args__ = (
-        UniqueConstraint("patient_id", "dt_measured", name="uc_respiratoryrate_patient_dt"),
-        Index("idx_respiratoryrate_patient_dt", "patient_id", "dt_measured"),
+        UniqueConstraint("record_id", "dt_measured", name="uc_respiratoryrate_patient_dt"),
+        Index("idx_respiratoryrate_patient_dt", "record_id", "dt_measured"),
     )
 
 class PatientBodyTemperature(Base, PatientBase):
     __tablename__ = "patient_body_temperature"
 
-    patient_id = Column(ForeignKey("patient_profile.id"))
     record_id = Column(ForeignKey("patient_records.id"))
     dt_measured = Column(DateTime)
     body_temperature = Column(Float)
 
     __table_args__ = (
-        UniqueConstraint("patient_id", "dt_measured", name="uc_bodytemperature_patient_dt"),
+        UniqueConstraint("record_id", "dt_measured", name="uc_bodytemperature_patient_dt"),
     )
 
 # Patient Biometrics:
@@ -149,7 +146,7 @@ class PatientBodyWeight(Base, PatientBase):
     __tablename__ = "patient_body_weight"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
+    dt_measured = Column(DateTime)
     body_weight = Column(Float)
 
 
@@ -157,7 +154,7 @@ class PatientHeight(Base, PatientBase):
     __tablename__ = "patient_height"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
+    dt_measured = Column(DateTime)
     height = Column(Float)
 
 
@@ -165,7 +162,7 @@ class PatientBodyMassIndex(Base, PatientBase):
     __tablename__ = "patient_bmi"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
+    dt_measured = Column(DateTime)
     bmi = Column(Float)
     notes = Column(ARRAY(String))
 
@@ -176,7 +173,6 @@ class PatientFamilyHistory(Base, PatientBase):
     __tablename__ = "patient_family_history"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
     hypertention = Column(Boolean, default=False)
     t2dm = Column(Boolean, default=False)
     asthma = Column(Boolean, default=False)
@@ -192,7 +188,6 @@ class PatientHospitalizationHistory(Base, PatientBase):
     __tablename__ = "patient_hospitalization_history"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
     chief_complaint = Column(String)
     admission_date = Column(Date)
     discharge_date = Column(Date)
@@ -205,7 +200,6 @@ class PatientMedicalHistory(Base, PatientBase):
     __tablename__ = "patient_medical_history"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
     hypertention = Column(Boolean, default=False)
     t2dm = Column(Boolean, default=False)
     asthma = Column(Boolean, default=False)
@@ -219,7 +213,6 @@ class PatientMedication(Base, PatientBase):
     __tablename__ = "patient_medication"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
     medication = Column(String)
     start_date = Column(Date)
     end_date = Column(Date, nullable=True)
@@ -232,7 +225,6 @@ class PatientOBHistory(Base, PatientBase):
     __tablename__ = "patient_ob_history"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
     gravida = Column(SMALLINT)
     para = Column(SMALLINT)
     term = Column(SMALLINT)
@@ -247,7 +239,23 @@ class PatientSurgicalHistory(Base, PatientBase):
     __tablename__ = "patient_surgical_history"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    record_id = Column(ForeignKey("patient_records.id"))
     chief_complaint = Column(String)
     surgery_date = Column(Date)
     notes = Column(ARRAY(String))
+
+
+class PatientAllergy(Base, PatientBase):
+    __tablename__ = "patient_allergy"
+
+    patient_id = Column(ForeignKey("patient_profile.id"))
+    allergen = Column(String)
+    reaction_description = Column(String)
+
+class PatientImmunization(Base, PatientBase):
+    __tablename__ = "patient_immunization"
+
+    patient_id = Column(ForeignKey("patient_profile.id"))
+    vaccine = Column(String)
+    date_administered = Column(Date)
+    notes = Column(String)
+

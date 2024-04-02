@@ -94,4 +94,4 @@ def read_account(account_id: str, member_id: str, db: Session):
 
 
 def read_account_from_host(host: str, db: Session):
-    return db.query(MedRekkAccount).filter(MedRekkAccount.account_subdomain == host).one_or_none()
+    return db.query(MedRekkAccount).filter(MedRekkAccount.account_subdomain == host.split(".")[0]).one_or_none()

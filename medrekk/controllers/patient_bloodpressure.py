@@ -11,13 +11,13 @@ from medrekk.utils import shortid
 
 
 def create_patient_bloodpressure(
-    patient_id: str,
+    record_id: str,
     patient_bp: PatientBloodPressureCreate,
     db: Session,
 ) -> PatientBloodPressure:
     try:
         new_bp = PatientBloodPressure(**patient_bp.model_dump())
-        new_bp.patient_id = patient_id
+        new_bp.record_id = record_id
         new_bp.id = shortid()
         db.add(new_bp)
         db.commit()

@@ -9,13 +9,16 @@ from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from jose.constants import ALGORITHMS
 
+from medrekk.database.connection import get_db
 from medrekk.database.token import token_store
 from medrekk.dependencies import oauth2_scheme
+from medrekk.models.patient import PatientRecord
 from medrekk.schemas.accounts import MemberRead
 from medrekk.schemas.token import Token
 from medrekk.models.medrekk import MedRekkAccount
 from .constants import HMAC_KEY, JWT_KEY, TOKEN_EXPIRE_MINUTES
 
+from sqlalchemy.orm import Session
 
 def generate_access_token(member: MemberRead, account: Optional[MedRekkAccount] = None) -> Token:
     
@@ -118,3 +121,16 @@ def hash_password(password: str):
 def verify_password(hashed: str, input: str):
     # Check if the input password matches the hashed password
     return bcrypt.checkpw(input.encode("utf-8"), hashed.encode())
+
+
+def is_account_record(
+        record_id: str,
+        account_id: Annotated[str, Depends(get_account_id)],
+        db: Annotated[Session, Depends(get_db)]
+):
+    record = db.query(PatientRecord).filter(PatientRecord.id == record_id).filter(PatientRecord.account_id == account_id).one_or_none()
+
+    if not record:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    
+    return record.id
