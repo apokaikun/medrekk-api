@@ -20,10 +20,12 @@ from .constants import HMAC_KEY, JWT_KEY, TOKEN_EXPIRE_MINUTES
 
 from sqlalchemy.orm import Session
 
-def generate_access_token(member: MemberRead, account: Optional[MedRekkAccount] = None) -> Token:
-    
-    account_id = account.id if account else member.account_id
 
+def generate_access_token(
+    member: MemberRead, account: Optional[MedRekkAccount] = None
+) -> Token:
+
+    account_id = account.id if account else member.account_id
 
     iat = datetime.now()
     exp = iat + timedelta(minutes=TOKEN_EXPIRE_MINUTES)
@@ -123,14 +125,23 @@ def verify_password(hashed: str, input: str):
     return bcrypt.checkpw(input.encode("utf-8"), hashed.encode())
 
 
-def is_account_record(
-        record_id: str,
-        account_id: Annotated[str, Depends(get_account_id)],
-        db: Annotated[Session, Depends(get_db)]
-):
-    record = db.query(PatientRecord).filter(PatientRecord.id == record_id).filter(PatientRecord.account_id == account_id).one_or_none()
+def account_record_id_validate(
+    record_id: str,
+    account_id: Annotated[str, Depends(get_account_id)],
+    db: Annotated[Session, Depends(get_db)],
+) -> str:
+    """
+    Validates record_id if it belongs to the account. Returns the record_id if `True`,
+    otherwise, it raises HTTPException of status 401 (Unauthorized).
+    """
+    record = (
+        db.query(PatientRecord)
+        .filter(PatientRecord.id == record_id)
+        .filter(PatientRecord.account_id == account_id)
+        .one_or_none()
+    )
 
     if not record:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    
+
     return record.id
