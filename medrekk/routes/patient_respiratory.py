@@ -2,6 +2,7 @@ from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
+
 from medrekk.controllers.patient_respiratory import (
     create_respiratory,
     delete_respiratory,
@@ -39,7 +40,10 @@ async def add_patient_respiratory_rate(
     return PatientRespiratoryRateRead.model_validate(new_respiratory)
 
 
-@respiratory_routes.get("/", response_model=List[PatientRespiratoryRateRead])
+@respiratory_routes.get(
+    "/",
+    response_model=List[PatientRespiratoryRateRead],
+)
 async def get_patient_respiratory_rates(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     db: Annotated[Session, Depends(get_db)],

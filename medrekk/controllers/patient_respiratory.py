@@ -37,9 +37,9 @@ def create_respiratory(
                     detail={
                         "status_code": status.HTTP_409_CONFLICT,
                         "content": {
-                            "msg": f"Patient cannot have multiple measurements "
+                            "msg": "Patient cannot have multiple measurements "
                             "for the same date and time. Date/Time: "
-                            "{new_respiratory.dt_measured}"
+                            f"{new_respiratory.dt_measured}"
                         },
                     },
                 )

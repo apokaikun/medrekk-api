@@ -124,7 +124,7 @@ class PatientBodyTemperatureDelete(BaseModel):
 
 
 class PatientBodyWeightCreate(BaseModel):
-    dt_measured: datetime
+    date_measured: date
     body_weight: float
 
 
@@ -141,7 +141,7 @@ class PatientBodyWeightDelete(BaseModel):
 
 
 class PatientHeightCreate(BaseModel):
-    dt_measured: datetime
+    date_measured: date
     height: float
 
 
@@ -158,7 +158,7 @@ class PatientHeightDelete(BaseModel):
 
 
 class PatientBodyMassIndexCreate(BaseModel):
-    dt_measured: datetime
+    date_measured: date
     bmi: float
 
 
