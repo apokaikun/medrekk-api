@@ -146,8 +146,12 @@ class PatientBodyWeight(Base, PatientBase):
     __tablename__ = "patient_body_weight"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    dt_measured = Column(DateTime)
+    date_measured = Column(Date)
     body_weight = Column(Float)
+
+    __table_args__ = (
+        UniqueConstraint("patient_id", "date_measured", name="uc_bodyweight_patient_date"),
+    )
 
 
 class PatientHeight(Base, PatientBase):
