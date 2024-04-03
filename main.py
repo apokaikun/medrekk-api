@@ -11,7 +11,11 @@ from medrekk.routes.patient_bloodpressures import bloodpressure_routes
 from medrekk.routes.patient_heartrates import heartrate_routes
 from medrekk.routes.patient_record import record_routes
 from medrekk.routes.patients import patient_routes
-
+from medrekk.routes.patient_respiratory import respiratory_routes
+from medrekk.routes.patient_temperature import bodytemp_routes
+from medrekk.routes.patient_weight import bodyweight_routes
+from medrekk.routes.patient_height import bodyheight_routes
+from medrekk.routes.patient_bmi import bmi_routes
 VERSION = "202403"
 VERSION_SUFFIX = "pre-alpha"
 DOCS_URL = f"/{VERSION}-{VERSION_SUFFIX}/docs"
@@ -46,3 +50,8 @@ medrekk_app.include_router(patient_routes)
 medrekk_app.include_router(record_routes)
 medrekk_app.include_router(bloodpressure_routes)
 medrekk_app.include_router(heartrate_routes)
+medrekk_app.include_router(respiratory_routes)
+medrekk_app.include_router(bodytemp_routes)
+medrekk_app.include_router(bodyweight_routes)
+medrekk_app.include_router(bodyheight_routes)
+medrekk_app.include_router(bmi_routes)

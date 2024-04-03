@@ -20,7 +20,7 @@ from medrekk.utils import routes
 from medrekk.utils.auth import account_record_id_validate, verify_jwt_token
 
 bloodpressure_routes = APIRouter(
-    prefix=f"/{routes.RECORDS}" + "/{record_id}",
+    prefix=f"/{routes.RECORDS}" + "/{record_id}" + f"/{routes.BLOODPRESSURES}",
     dependencies=[Depends(verify_jwt_token)],
     tags=["Patient Blood Pressure"],
 )
@@ -29,7 +29,7 @@ bloodpressure_routes = APIRouter(
 
 
 @bloodpressure_routes.post(
-    "/bloodpressure/",
+    "/",
     response_model=PatientBloodPressureRead,
     name="Add Patient Blood Pressure",
 )
@@ -44,7 +44,7 @@ async def add_bloodpressure(
 
 
 @bloodpressure_routes.get(
-    "/bloodpressure/",
+    "/",
     response_model=List[PatientBloodPressureRead],
     name="Get Patient Blood Pressures",
 )
@@ -62,7 +62,7 @@ async def get_bloodpressures(
 
 
 @bloodpressure_routes.get(
-    "/bloodpressure/{bp_id}/",
+    "/{bp_id}/",
     response_model=PatientBloodPressureRead,
     name="Get Patient Blood Pressure",
 )
@@ -77,7 +77,7 @@ async def get_bloodpressure(
 
 
 @bloodpressure_routes.put(
-    "/bloodpressure/{bp_id}",
+    "/{bp_id}",
     response_model=PatientBloodPressureRead,
     name="Update Blood Pressure Record",
 )
@@ -93,7 +93,7 @@ async def put_bloodpressure(
 
 
 @bloodpressure_routes.delete(
-    "/bloodpressure/{bp_id}",
+    "/{bp_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_bloodpressure(

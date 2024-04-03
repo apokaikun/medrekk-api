@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from typing import List
-
 from sqlalchemy import (
     Boolean,
     Column,

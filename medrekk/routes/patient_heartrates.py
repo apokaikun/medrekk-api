@@ -20,7 +20,7 @@ from medrekk.utils import routes
 from medrekk.utils.auth import account_record_id_validate, verify_jwt_token
 
 heartrate_routes = APIRouter(
-    prefix=f"/{routes.RECORDS}" + "/{record_id}",
+    prefix=f"/{routes.RECORDS}" + "/{record_id}" + f"/{routes.HEARTRATES}",
     dependencies=[Depends(verify_jwt_token)],
     tags=["Patient Heart Rate"],
 )
@@ -29,7 +29,7 @@ heartrate_routes = APIRouter(
 
 
 @heartrate_routes.post(
-    "/heartrate/",
+    "/",
     response_model=PatientHeartRateRead,
     status_code=status.HTTP_201_CREATED,
     name="Add Patient Heart Rate",
@@ -45,7 +45,7 @@ async def add_patient_heartrate(
 
 
 @heartrate_routes.get(
-    "/heartrate/",
+    "/",
     response_model=List[PatientHeartRateRead],
     name="Get Patient Heart Rates",
 )
@@ -62,7 +62,7 @@ async def get_patient_heartrates(
 
 
 @heartrate_routes.get(
-    "/heartrate/{heartrate_id}/",
+    "/{heartrate_id}/",
     response_model=PatientHeartRateRead,
     name="Get Patient Heart Rate",
 )
@@ -77,7 +77,7 @@ async def get_patient_heartrate(
 
 
 @heartrate_routes.put(
-    "/heartrate/{heartrate_id}/",
+    "/{heartrate_id}/",
     response_model=PatientHeartRateRead,
     name="Update Patient Heart Rate",
 )
@@ -93,7 +93,7 @@ async def put_patient_heartrate(
 
 
 @heartrate_routes.delete(
-    "/heartrate/{heartrate_id}/",
+    "/{heartrate_id}/",
     status_code=status.HTTP_204_NO_CONTENT,
     name="Delete Patient Heart Rate",
 )
