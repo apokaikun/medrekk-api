@@ -78,3 +78,14 @@ async def update_patient_bodyweight(
     updated_bodyweight = update_bodyweight(patient_id, bodyweight_id, bodyweight, db)
 
     return updated_bodyweight
+
+@bodyweight_routes.delete(
+    "/{bodyweight_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_patient_bodyweight(
+    patient_id: str,
+    bodyweight_id: str,
+    db: Annotated[Session, Depends(get_db)],
+):
+    return delete_bodyweight(patient_id, bodyweight_id, db)
