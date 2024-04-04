@@ -52,6 +52,7 @@ class PatientAppointments(Base, PatientBase):
     patient_id = Column(ForeignKey("patient_profile.id"))
     appointment_date = Column(Date, nullable=False)
 
+
 class PatientVisit(Base, PatientBase):
     __tablename__ = "patient_visits"
 
@@ -65,15 +66,18 @@ class PatientVisit(Base, PatientBase):
         UniqueConstraint("patient_id", "visit_date", name="uc_patient_visit"),
     )
 
+
 class PatientRecord(Base, PatientBase):
     __tablename__ = "patient_records"
 
     account_id = Column(ForeignKey("medrekk_accounts.id"))
     patient_id = Column(ForeignKey("patient_profile.id"))
     chief_complaint = Column(ARRAY(String))
-    
+
     diagnosis: Mapped[List["PatientDiagnosis"]] = relationship(backref="record")
-    body_temperatures:Mapped[List["PatientBodyTemperature"]] = relationship(backref='record')
+    body_temperatures: Mapped[List["PatientBodyTemperature"]] = relationship(
+        backref="record"
+    )
 
 
 class PatientDiagnosis(Base, PatientBase):
@@ -82,6 +86,7 @@ class PatientDiagnosis(Base, PatientBase):
     record_id = Column(ForeignKey("patient_records.id"))
     diagnosis_code = Column(String)
     diagnosis_description = Column(String)
+
 
 # Patient Vitals:
 #   PatientBloodPressure,
@@ -97,7 +102,9 @@ class PatientBloodPressure(Base, PatientBase):
     diastolic = Column(SMALLINT)
 
     __table_args__ = (
-        UniqueConstraint("record_id", "dt_measured", name="uc_bloodpressure_patient_dt"),
+        UniqueConstraint(
+            "record_id", "dt_measured", name="uc_bloodpressure_patient_dt"
+        ),
         Index("idx_bloodpressure_patient_dt", "record_id", "dt_measured"),
     )
 
@@ -123,9 +130,12 @@ class PatientRespiratoryRate(Base, PatientBase):
     respiratory_rate = Column(SMALLINT)
 
     __table_args__ = (
-        UniqueConstraint("record_id", "dt_measured", name="uc_respiratoryrate_patient_dt"),
+        UniqueConstraint(
+            "record_id", "dt_measured", name="uc_respiratoryrate_patient_dt"
+        ),
         Index("idx_respiratoryrate_patient_dt", "record_id", "dt_measured"),
     )
+
 
 class PatientBodyTemperature(Base, PatientBase):
     __tablename__ = "patient_body_temperature"
@@ -135,8 +145,11 @@ class PatientBodyTemperature(Base, PatientBase):
     body_temperature = Column(Float)
 
     __table_args__ = (
-        UniqueConstraint("record_id", "dt_measured", name="uc_bodytemperature_patient_dt"),
+        UniqueConstraint(
+            "record_id", "dt_measured", name="uc_bodytemperature_patient_dt"
+        ),
     )
+
 
 # Patient Biometrics:
 #   PatientBodyWeight
@@ -150,7 +163,9 @@ class PatientBodyWeight(Base, PatientBase):
     body_weight = Column(Float)
 
     __table_args__ = (
-        UniqueConstraint("patient_id", "date_measured", name="uc_bodyweight_patient_date"),
+        UniqueConstraint(
+            "patient_id", "date_measured", name="uc_bodyweight_patient_date"
+        ),
     )
 
 
@@ -158,17 +173,25 @@ class PatientHeight(Base, PatientBase):
     __tablename__ = "patient_height"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    dt_measured = Column(DateTime)
+    date_measured = Column(Date)
     height = Column(Float)
+
+    __table_args__ = (
+        UniqueConstraint("patient_id", "date_measured", name="uc_height_patient_date"),
+    )
 
 
 class PatientBodyMassIndex(Base, PatientBase):
     __tablename__ = "patient_bmi"
 
     patient_id = Column(ForeignKey("patient_profile.id"))
-    dt_measured = Column(DateTime)
+    date_measured = Column(Date)
     bmi = Column(Float)
     notes = Column(ARRAY(String))
+
+    __table_args__ = (
+        UniqueConstraint("patient_id", "date_measured", name="uc_bmi_patient_date"),
+    )
 
 
 # Patient Family History:
@@ -176,7 +199,7 @@ class PatientBodyMassIndex(Base, PatientBase):
 class PatientFamilyHistory(Base, PatientBase):
     __tablename__ = "patient_family_history"
 
-    patient_id = Column(ForeignKey("patient_profile.id"))
+    patient_id = Column(ForeignKey("patient_profile.id"), unique=True)
     hypertention = Column(Boolean, default=False)
     t2dm = Column(Boolean, default=False)
     asthma = Column(Boolean, default=False)
@@ -191,7 +214,7 @@ class PatientFamilyHistory(Base, PatientBase):
 class PatientHospitalizationHistory(Base, PatientBase):
     __tablename__ = "patient_hospitalization_history"
 
-    patient_id = Column(ForeignKey("patient_profile.id"))
+    patient_id = Column(ForeignKey("patient_profile.id"), unique=True)
     chief_complaint = Column(String)
     admission_date = Column(Date)
     discharge_date = Column(Date)
@@ -203,24 +226,12 @@ class PatientHospitalizationHistory(Base, PatientBase):
 class PatientMedicalHistory(Base, PatientBase):
     __tablename__ = "patient_medical_history"
 
-    patient_id = Column(ForeignKey("patient_profile.id"))
+    patient_id = Column(ForeignKey("patient_profile.id"), unique=True)
     hypertention = Column(Boolean, default=False)
     t2dm = Column(Boolean, default=False)
     asthma = Column(Boolean, default=False)
     cancer = Column(Boolean, default=False)
     others = Column(ARRAY(String))
-
-
-# Patient Medication Records
-#   PatientMedication
-class PatientMedication(Base, PatientBase):
-    __tablename__ = "patient_medication"
-
-    patient_id = Column(ForeignKey("patient_profile.id"))
-    medication = Column(String)
-    start_date = Column(Date)
-    end_date = Column(Date, nullable=True)
-    notes = Column(ARRAY(String), nullable=True)
 
 
 # Patient OB History
@@ -239,6 +250,18 @@ class PatientOBHistory(Base, PatientBase):
     notes = Column(ARRAY(String))
 
 
+# Patient Medication Records
+#   PatientMedication
+class PatientMedication(Base, PatientBase):
+    __tablename__ = "patient_medication"
+
+    patient_id = Column(ForeignKey("patient_profile.id"))
+    medication = Column(String)
+    start_date = Column(Date)
+    end_date = Column(Date, nullable=True)
+    notes = Column(ARRAY(String), nullable=True)
+
+
 class PatientSurgicalHistory(Base, PatientBase):
     __tablename__ = "patient_surgical_history"
 
@@ -255,6 +278,7 @@ class PatientAllergy(Base, PatientBase):
     allergen = Column(String)
     reaction_description = Column(String)
 
+
 class PatientImmunization(Base, PatientBase):
     __tablename__ = "patient_immunization"
 
@@ -262,4 +286,3 @@ class PatientImmunization(Base, PatientBase):
     vaccine = Column(String)
     date_administered = Column(Date)
     notes = Column(String)
-
