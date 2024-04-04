@@ -239,7 +239,7 @@ class PatientMedicalHistory(Base, PatientBase):
 class PatientOBHistory(Base, PatientBase):
     __tablename__ = "patient_ob_history"
 
-    patient_id = Column(ForeignKey("patient_profile.id"))
+    patient_id = Column(ForeignKey("patient_profile.id"), unique=True)
     gravida = Column(SMALLINT)
     para = Column(SMALLINT)
     term = Column(SMALLINT)

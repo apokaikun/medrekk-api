@@ -16,6 +16,8 @@ from medrekk.routes.patient_temperature import bodytemp_routes
 from medrekk.routes.patient_weight import bodyweight_routes
 from medrekk.routes.patient_height import bodyheight_routes
 from medrekk.routes.patient_bmi import bmi_routes
+from medrekk.routes.patient_family_history import family_history_routes
+
 VERSION = "202403"
 VERSION_SUFFIX = "pre-alpha"
 DOCS_URL = f"/{VERSION}-{VERSION_SUFFIX}/docs"
@@ -55,3 +57,4 @@ medrekk_app.include_router(bodytemp_routes)
 medrekk_app.include_router(bodyweight_routes)
 medrekk_app.include_router(bodyheight_routes)
 medrekk_app.include_router(bmi_routes)
+medrekk_app.include_router(family_history_routes)

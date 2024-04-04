@@ -1,7 +1,8 @@
 from datetime import datetime, date, timezone
 import time
 from typing import List, Optional
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import DateTime
 
 
 class PatientBase(BaseModel):
@@ -49,10 +50,7 @@ class PatientProfileDelete(BaseModel):
 
 
 class PatientBloodPressureCreate(BaseModel):
-    dt_measured: datetime = Field(
-        datetime,
-        examples=[time.strftime("%Y-%m-%d %H:%M", time.localtime())],
-    )
+    dt_measured: datetime
     systolic: int
     diastolic: int
 
@@ -70,10 +68,7 @@ class PatientBloodPressureDelete(BaseModel):
 
 
 class PatientHeartRateCreate(BaseModel):
-    dt_measured: AwareDatetime = Field(
-        datetime,
-        examples=[time.strftime("%Y-%m-%d %H:%M", time.localtime())],
-    )
+    dt_measured: datetime
     heart_rate: int
 
 
