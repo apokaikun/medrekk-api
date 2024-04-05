@@ -20,7 +20,7 @@ from medrekk.utils import routes
 from medrekk.utils.auth import verify_jwt_token
 
 hospitalization_history_routes = APIRouter(
-    prefix=f"/{routes.PATIENTS}" + "/{patient_id}" + f"/{routes.FAMILYHISTORY}",
+    prefix=f"/{routes.PATIENTS}" + "/{patient_id}" + f"/{routes.HOSPITALIZATIONHISTORY}",
     dependencies=[Depends(verify_jwt_token)],
     tags=["Patient Hospitalization History"],
 )
