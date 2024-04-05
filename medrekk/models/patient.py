@@ -91,6 +91,9 @@ class PatientDiagnosis(Base, PatientBase):
     notes = Column(ARRAY(String))
     status = Column(String)
 
+    __table_args__ = (
+        UniqueConstraint("record_id", "diagnosis_code", name="uc_record_diagnosis"),
+    )
 
 # Patient Vitals:
 #   PatientBloodPressure,
