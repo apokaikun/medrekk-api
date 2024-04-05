@@ -72,7 +72,7 @@ def read_heights(
 ) -> List[PatientHeight]:
     heights = (
         db.query(PatientHeight)
-        .filter(PatientHeight.id == patient_id)
+        .filter(PatientHeight.patient_id == patient_id)
         .order_by(PatientHeight.created.desc())
         .all()
     )

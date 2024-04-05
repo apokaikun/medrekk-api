@@ -72,7 +72,7 @@ def read_bmis(
 ) -> List[PatientBodyMassIndex]:
     bmis = (
         db.query(PatientBodyMassIndex)
-        .filter(PatientBodyMassIndex.id == patient_id)
+        .filter(PatientBodyMassIndex.patient_id == patient_id)
         .order_by(PatientBodyMassIndex.created.desc())
         .all()
     )

@@ -70,7 +70,7 @@ def read_family_histories(
 ) -> List[PatientFamilyHistory]:
     family_histories = (
         db.query(PatientFamilyHistory)
-        .filter(PatientFamilyHistory.id == patient_id)
+        .filter(PatientFamilyHistory.patient_id == patient_id)
         .order_by(PatientFamilyHistory.created.desc())
         .all()
     )
