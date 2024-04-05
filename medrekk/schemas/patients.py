@@ -1,5 +1,6 @@
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import List, Optional
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -277,8 +278,50 @@ class PatientSurgicalHistoryCreate(BaseModel):
     surgery_date: date
     notes: List[str] = []
 
+
 class PatientSurgicalHistoryRead(PatientSurgicalHistoryCreate, PatientBase):
     pass
 
+
 class PatientSurgicalHistoryUpdate(PatientSurgicalHistoryCreate):
+    pass
+
+
+class PatientAllergyCreate(BaseModel):
+    """
+    class PatientAllergyCreate(BaseModel):
+        allergen: str
+        reaction_description: str
+    """
+
+    allergen: str
+    reaction_description: str
+    notes: List[str] = []
+
+
+class PatientAllergyRead(PatientAllergyCreate, PatientBase):
+    pass
+
+
+class PatientAllergyUpdate(PatientAllergyCreate):
+    pass
+
+
+class PatientImmunizationCreate(BaseModel):
+    """
+    class PatientImmunizationCreate(BaseModel):
+        allergen: str
+        reaction_description: str
+    """
+
+    vaccine: str
+    date_administered: str
+    notes: List[str] = []
+
+
+class PatientImmunizationRead(PatientImmunizationCreate, PatientBase):
+    pass
+
+
+class PatientImmunizationUpdate(PatientImmunizationCreate):
     pass
