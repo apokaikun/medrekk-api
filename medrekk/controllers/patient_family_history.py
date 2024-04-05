@@ -1,12 +1,13 @@
-from typing import List
-
 from fastapi import HTTPException, status
 from psycopg.errors import UniqueViolation
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.models.patient import PatientFamilyHistory
-from medrekk.schemas.patients import PatientFamilyHistoryCreate, PatientFamilyHistoryUpdate
+from medrekk.schemas.patients import (
+    PatientFamilyHistoryCreate,
+    PatientFamilyHistoryUpdate,
+)
 from medrekk.utils import shortid
 
 
@@ -33,9 +34,7 @@ def create_family_history(
                     status_code=status.HTTP_409_CONFLICT,
                     detail={
                         "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient family history already exists."
-                        },
+                        "content": {"msg": "Patient family history already exists."},
                     },
                 )
 
@@ -64,20 +63,6 @@ def read_family_history(
     return family_history_db
 
 
-def read_family_histories(
-    patient_id: str,
-    db: Session,
-) -> List[PatientFamilyHistory]:
-    family_histories = (
-        db.query(PatientFamilyHistory)
-        .filter(PatientFamilyHistory.patient_id == patient_id)
-        .order_by(PatientFamilyHistory.created.desc())
-        .all()
-    )
-
-    return family_histories
-
-
 def update_family_history(
     patient_id: str,
     family_history_id: str,
@@ -96,7 +81,6 @@ def update_family_history(
     return family_history_db
 
 
-
 def delete_family_history(
     patient_id: str,
     family_history_id: str,
@@ -108,4 +92,3 @@ def delete_family_history(
     db.commit()
 
     return None
-

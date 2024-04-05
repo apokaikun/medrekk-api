@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
@@ -7,7 +7,6 @@ from medrekk.controllers.patient_family_history import (
     create_family_history,
     delete_family_history,
     read_family_history,
-    read_family_histories,
     update_family_history,
 )
 from medrekk.database.connection import get_db
@@ -40,17 +39,6 @@ async def add_patient_family_history(
 
     return new_family_history
 
-@family_history_routes.get(
-    "/",
-    response_model=List[PatientFamilyHistoryRead],
-)
-async def get_patient_family_histories(
-    patient_id: str,
-    db: Annotated[Session, Depends(get_db)]
-):
-    family_histories = read_family_histories(patient_id, db)
-
-    return family_histories
 
 @family_history_routes.get(
     "/{family_history_id}",
