@@ -41,13 +41,13 @@ def create_patient_diagnosis(
     except DBAPIError as e:
         if isinstance(e.orig, UniqueViolation):
             args: str = e.orig.args[0]
-            if args.find("uc_diagnosis_patient_dt"):
+            if args.find("uc_record_diagnosis"):
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail={
                         "status_code": status.HTTP_409_CONFLICT,
                         "content": {
-                            "msg": f"Patient cannot have multiple measurements for the same date and time. Date/Time: {new_diagnosis.dt_measured}"
+                            "msg": f"Patient cannot have the same diagnosis in one record: {new_diagnosis.diagnosis_code}"
                         },
                     },
                 )
