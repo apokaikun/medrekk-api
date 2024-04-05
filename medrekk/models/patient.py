@@ -280,6 +280,7 @@ class PatientAllergy(Base, PatientBase):
     patient_id = Column(ForeignKey("patient_profile.id"))
     allergen = Column(String)
     reaction_description = Column(String)
+    notes = Column(ARRAY(String), nullable=True)
 
 
 class PatientImmunization(Base, PatientBase):
@@ -288,4 +289,4 @@ class PatientImmunization(Base, PatientBase):
     patient_id = Column(ForeignKey("patient_profile.id"))
     vaccine = Column(String)
     date_administered = Column(Date)
-    notes = Column(String)
+    notes = Column(ARRAY(String), nullable=True)
