@@ -14,6 +14,7 @@ from medrekk.routes import (
     bodyheight_routes,
     bodytemp_routes,
     bodyweight_routes,
+    diagnosis_routes,
     family_history_routes,
     heartrate_routes,
     hospitalization_history_routes,
@@ -71,7 +72,7 @@ medrekk_app.include_router(allergy_routes)
 medrekk_app.include_router(immunization_routes)
 
 medrekk_app.include_router(record_routes)
-# diagnosis
+medrekk_app.include_router(diagnosis_routes)
 # lab results
 medrekk_app.include_router(bloodpressure_routes)
 medrekk_app.include_router(heartrate_routes)

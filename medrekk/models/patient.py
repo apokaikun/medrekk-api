@@ -87,6 +87,9 @@ class PatientDiagnosis(Base, PatientBase):
     record_id = Column(ForeignKey("patient_records.id"))
     diagnosis_code = Column(String)
     diagnosis_description = Column(String)
+    treatment_plans = Column(ARRAY(String))
+    notes = Column(ARRAY(String))
+    status = Column(String)
 
 
 # Patient Vitals:

@@ -325,3 +325,26 @@ class PatientImmunizationRead(PatientImmunizationCreate, PatientBase):
 
 class PatientImmunizationUpdate(PatientImmunizationCreate):
     pass
+
+
+class PatientDiagnosisCreate(BaseModel):
+    """
+    class PatientDiagnosisCreate(BaseModel):
+        allergen: str
+        reaction_description: str
+    """
+
+    diagnosis_code: str
+    diagnosis_description: str
+    treatment_plans: List[str]
+    notes: List[str]
+    status: str = Field(str, examples=["active", "resolved", "chronic"])
+
+
+class PatientDiagnosisRead(PatientDiagnosisCreate, PatientBase):
+    pass
+
+
+class PatientDiagnosisUpdate(PatientDiagnosisCreate):
+    pass
+
