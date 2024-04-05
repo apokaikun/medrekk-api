@@ -276,3 +276,9 @@ class PatientSurgicalHistoryCreate(BaseModel):
     chief_complaint: str
     surgery_date: date
     notes: List[str] = []
+
+class PatientSurgicalHistoryRead(PatientSurgicalHistoryCreate, PatientBase):
+    pass
+
+class PatientSurgicalHistoryUpdate(PatientSurgicalHistoryCreate):
+    pass
