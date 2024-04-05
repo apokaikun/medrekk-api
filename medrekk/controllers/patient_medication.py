@@ -34,7 +34,7 @@ def create_medication(
                     detail={
                         "status_code": status.HTTP_409_CONFLICT,
                         "content": {
-                            "msg": "Patient hospitalization history already exists."
+                            "msg": "Patient medication history already exists."
                         },
                     },
                 )
@@ -57,7 +57,7 @@ def read_medication(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": "Patient hospitalization history data NOT FOUND."},
+                "content": {"msg": "Patient medication history data NOT FOUND."},
             },
         )
 
@@ -68,14 +68,14 @@ def read_medications(
     patient_id: str,
     db: Session,
 ) -> List[PatientMedication]:
-    hospitalization_histories = (
+    medications = (
         db.query(PatientMedication)
         .filter(PatientMedication.patient_id == patient_id)
         .order_by(PatientMedication.created.desc())
         .all()
     )
 
-    return hospitalization_histories
+    return medications
 
 
 def update_medication(
