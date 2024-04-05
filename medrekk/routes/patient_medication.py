@@ -3,7 +3,7 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from medrekk.controllers.patient_medications import (
+from medrekk.controllers.patient_medication import (
     create_medication,
     delete_medication,
     read_medication,
