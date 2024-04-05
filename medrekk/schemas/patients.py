@@ -234,7 +234,7 @@ class PatientMedicationCreate(BaseModel):
     medication: str
     start_date: datetime
     end_date: Optional[datetime] = None
-    notes: Optional[str] = None
+    notes: List[str] = []
 
 
 class PatientMedicationRead(PatientMedicationCreate, PatientBase):
