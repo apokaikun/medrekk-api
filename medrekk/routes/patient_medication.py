@@ -44,13 +44,13 @@ async def add_patient_medication(
     "/",
     response_model=List[PatientMedicationRead],
 )
-async def get_patient_hospitalization_histories(
+async def get_patient_medications(
     patient_id: str,
     db: Annotated[Session, Depends(get_db)]
 ):
-    hospitalization_histories = read_medications(patient_id, db)
+    medications = read_medications(patient_id, db)
 
-    return hospitalization_histories
+    return medications
 
 @medication_routes.get(
     "/{medication_id}",
