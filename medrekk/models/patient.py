@@ -207,27 +207,13 @@ class PatientFamilyHistory(Base, PatientBase):
     others = Column(ARRAY(String))
 
 
-# Patient Hospitalization History
-#   PatientHospitalizationHistory
-
-
-class PatientHospitalizationHistory(Base, PatientBase):
-    __tablename__ = "patient_hospitalization_history"
-
-    patient_id = Column(ForeignKey("patient_profile.id"), unique=True)
-    chief_complaint = Column(String)
-    admission_date = Column(Date)
-    discharge_date = Column(Date)
-    notes = Column(ARRAY(String))
-
-
 # Patient Medical History
 #   PatientMedicalHistory
 class PatientMedicalHistory(Base, PatientBase):
     __tablename__ = "patient_medical_history"
 
     patient_id = Column(ForeignKey("patient_profile.id"), unique=True)
-    hypertention = Column(Boolean, default=False)
+    hypertension = Column(Boolean, default=False)
     t2dm = Column(Boolean, default=False)
     asthma = Column(Boolean, default=False)
     cancer = Column(Boolean, default=False)
@@ -249,6 +235,18 @@ class PatientOBHistory(Base, PatientBase):
     others = Column(ARRAY(String))
     notes = Column(ARRAY(String))
 
+# Patient Hospitalization History
+#   PatientHospitalizationHistory
+
+
+class PatientHospitalizationHistory(Base, PatientBase):
+    __tablename__ = "patient_hospitalization_history"
+
+    patient_id = Column(ForeignKey("patient_profile.id"))
+    chief_complaint = Column(String)
+    admission_date = Column(Date)
+    discharge_date = Column(Date)
+    notes = Column(ARRAY(String))
 
 # Patient Medication Records
 #   PatientMedication
