@@ -42,13 +42,11 @@ def create_medical_history(
 
 def read_medical_history(
     patient_id: str,
-    medical_history_id: str,
     db: Session,
 ) -> PatientMedicalHistory:
     medical_history_db = (
         db.query(PatientMedicalHistory)
         .filter(PatientMedicalHistory.patient_id == patient_id)
-        .filter(PatientMedicalHistory.id == medical_history_id)
         .one_or_none()
     )
 
@@ -66,11 +64,10 @@ def read_medical_history(
 
 def update_medical_history(
     patient_id: str,
-    medical_history_id: str,
     medical_history: PatientMedicalHistoryUpdate,
     db: Session,
 ) -> PatientMedicalHistory:
-    medical_history_db = read_medical_history(patient_id, medical_history_id, db)
+    medical_history_db = read_medical_history(patient_id, db)
 
     for field, value in medical_history.model_dump(exclude_unset=True).items():
         setattr(medical_history_db, field, value)
@@ -85,10 +82,9 @@ def update_medical_history(
 
 def delete_medical_history(
     patient_id: str,
-    medical_history_id: str,
     db: Session,
 ) -> None:
-    medical_history_db = read_medical_history(patient_id, medical_history_id, db)
+    medical_history_db = read_medical_history(patient_id, db)
 
     db.delete(medical_history_db)
     db.commit()

@@ -1,8 +1,6 @@
-from datetime import datetime, date, timezone
-import time
+from datetime import datetime, date
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import DateTime
 
 
 class PatientBase(BaseModel):
@@ -173,8 +171,9 @@ class PatientFamilyHistoryCreate(BaseModel):
     hypertension: bool = False
     t2dm: bool = False
     asthma: bool = False
-    cancer: str = False
+    cancer: bool = False
     others: List[str] = []
+    notes: List[str] = []
 
 
 class PatientFamilyHistoryRead(PatientFamilyHistoryCreate, PatientBase):
@@ -216,6 +215,7 @@ class PatientMedicalHistoryCreate(BaseModel):
     asthma: bool = False
     cancer: bool = False
     others: List[str] = []
+    notes: List[str] = []
 
 
 class PatientMedicalHistoryRead(PatientMedicalHistoryCreate, PatientBase):

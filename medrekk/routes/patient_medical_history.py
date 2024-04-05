@@ -41,43 +41,40 @@ async def add_patient_medical_history(
 
 
 @medical_history_routes.get(
-    "/{medical_history_id}",
+    "/",
     response_model=PatientMedicalHistoryRead,
 )
 async def get_patient_medical_history(
     patient_id: str,
-    medical_history_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    medical_history = read_medical_history(patient_id, medical_history_id, db)
+    medical_history = read_medical_history(patient_id, db)
 
     return medical_history
 
 
 @medical_history_routes.put(
-    "/{medical_history_id}",
+    "/",
     response_model=PatientMedicalHistoryRead,
 )
 async def update_patient_medical_history(
     patient_id: str,
-    medical_history_id: str,
     medical_history: PatientMedicalHistoryUpdate,
     db: Annotated[Session, Depends(get_db)],
 ):
     updated_medical_history = update_medical_history(
-        patient_id, medical_history_id, medical_history, db
+        patient_id, medical_history, db
     )
 
     return updated_medical_history
 
 
 @medical_history_routes.delete(
-    "/{medical_history_id}",
+    "/",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_patient_medical_history(
     patient_id: str,
-    medical_history_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    return delete_medical_history(patient_id, medical_history_id, db)
+    return delete_medical_history(patient_id, db)

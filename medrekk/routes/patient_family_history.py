@@ -41,39 +41,36 @@ async def add_patient_family_history(
 
 
 @family_history_routes.get(
-    "/{family_history_id}",
+    "/",
     response_model=PatientFamilyHistoryRead,
 )
 async def get_patient_family_history(
     patient_id: str,
-    family_history_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    family_history = read_family_history(patient_id, family_history_id, db)
+    family_history = read_family_history(patient_id, db)
 
     return family_history
 
 @family_history_routes.put(
-    "/{family_history_id}",
+    "/",
     response_model=PatientFamilyHistoryRead,
 )
 async def update_patient_family_history(
     patient_id: str,
-    family_history_id: str,
     family_history: PatientFamilyHistoryUpdate,
     db: Annotated[Session, Depends(get_db)],
 ):
-    updated_family_history = update_family_history(patient_id, family_history_id, family_history, db)
+    updated_family_history = update_family_history(patient_id, family_history, db)
 
     return updated_family_history
 
 @family_history_routes.delete(
-    "/{family_history_id}",
+    "/",
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_patient_family_history(
     patient_id: str,
-    family_history_id: str,
     db: Annotated[Session, Depends(get_db)],
 ):
-    return delete_family_history(patient_id, family_history_id, db)
+    return delete_family_history(patient_id, db)

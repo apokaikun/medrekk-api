@@ -14,7 +14,8 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import Mapped, relationship
+
 from medrekk.database.connection import Base
 from medrekk.utils import shortid
 
@@ -200,11 +201,12 @@ class PatientFamilyHistory(Base, PatientBase):
     __tablename__ = "patient_family_history"
 
     patient_id = Column(ForeignKey("patient_profile.id"), unique=True)
-    hypertention = Column(Boolean, default=False)
+    hypertension = Column(Boolean, default=False)
     t2dm = Column(Boolean, default=False)
     asthma = Column(Boolean, default=False)
     cancer = Column(Boolean, default=False)
     others = Column(ARRAY(String))
+    notes = Column(ARRAY(String))
 
 
 # Patient Medical History
@@ -218,6 +220,7 @@ class PatientMedicalHistory(Base, PatientBase):
     asthma = Column(Boolean, default=False)
     cancer = Column(Boolean, default=False)
     others = Column(ARRAY(String))
+    notes = Column(ARRAY(String))
 
 
 # Patient OB History
@@ -235,6 +238,7 @@ class PatientOBHistory(Base, PatientBase):
     others = Column(ARRAY(String))
     notes = Column(ARRAY(String))
 
+
 # Patient Hospitalization History
 #   PatientHospitalizationHistory
 
@@ -248,6 +252,16 @@ class PatientHospitalizationHistory(Base, PatientBase):
     discharge_date = Column(Date)
     notes = Column(ARRAY(String))
 
+
+class PatientSurgicalHistory(Base, PatientBase):
+    __tablename__ = "patient_surgical_history"
+
+    patient_id = Column(ForeignKey("patient_profile.id"))
+    chief_complaint = Column(String)
+    surgery_date = Column(Date)
+    notes = Column(ARRAY(String))
+
+
 # Patient Medication Records
 #   PatientMedication
 class PatientMedication(Base, PatientBase):
@@ -258,15 +272,6 @@ class PatientMedication(Base, PatientBase):
     start_date = Column(Date)
     end_date = Column(Date, nullable=True)
     notes = Column(ARRAY(String), nullable=True)
-
-
-class PatientSurgicalHistory(Base, PatientBase):
-    __tablename__ = "patient_surgical_history"
-
-    patient_id = Column(ForeignKey("patient_profile.id"))
-    chief_complaint = Column(String)
-    surgery_date = Column(Date)
-    notes = Column(ARRAY(String))
 
 
 class PatientAllergy(Base, PatientBase):

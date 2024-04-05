@@ -41,13 +41,11 @@ def create_family_history(
 
 def read_family_history(
     patient_id: str,
-    family_history_id: str,
     db: Session,
 ) -> PatientFamilyHistory:
     family_history_db = (
         db.query(PatientFamilyHistory)
         .filter(PatientFamilyHistory.patient_id == patient_id)
-        .filter(PatientFamilyHistory.id == family_history_id)
         .one_or_none()
     )
 
@@ -65,11 +63,10 @@ def read_family_history(
 
 def update_family_history(
     patient_id: str,
-    family_history_id: str,
     family_history: PatientFamilyHistoryUpdate,
     db: Session,
 ) -> PatientFamilyHistory:
-    family_history_db = read_family_history(patient_id, family_history_id, db)
+    family_history_db = read_family_history(patient_id, db)
 
     for field, value in family_history.model_dump(exclude_unset=True).items():
         setattr(family_history_db, field, value)
@@ -83,10 +80,9 @@ def update_family_history(
 
 def delete_family_history(
     patient_id: str,
-    family_history_id: str,
     db: Session,
 ) -> None:
-    family_history_db = read_family_history(patient_id, family_history_id, db)
+    family_history_db = read_family_history(patient_id, db)
 
     db.delete(family_history_db)
     db.commit()
