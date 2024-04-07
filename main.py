@@ -4,11 +4,12 @@ from fastapi import Depends, FastAPI
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
-from medrekk.controllers.init import init_db
-from medrekk.database.connection import get_db
-from medrekk.routes import (
+from medrekk.admin.routes.accounts import account_routes, account_routes_verified
+from medrekk.auth.routes.auth import auth_routes
+from medrekk.common.database.connection import get_db
+from medrekk.common.controllers.init import init_db
+from medrekk.patient.routes import (
     allergy_routes,
-    auth_routes,
     bloodpressure_routes,
     bmi_routes,
     bodyheight_routes,
@@ -55,6 +56,9 @@ def root(init: bool, db: Annotated[Session, Depends(get_db)]):
 
 
 medrekk_app.include_router(auth_routes)
+
+medrekk_app.include_router(account_routes)
+medrekk_app.include_router(account_routes_verified)
 
 medrekk_app.include_router(patient_routes)
 medrekk_app.include_router(bodyweight_routes)
