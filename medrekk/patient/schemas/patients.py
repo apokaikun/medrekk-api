@@ -2,6 +2,7 @@ from datetime import date, datetime
 from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
+from sqlalchemy import String
 
 
 class PatientBase(BaseModel):
@@ -338,7 +339,7 @@ class PatientDiagnosisCreate(BaseModel):
     diagnosis_description: str
     treatment_plans: List[str]
     notes: List[str]
-    status: str = Field(str, examples=["active", "resolved", "chronic"])
+    status: str
 
 
 class PatientDiagnosisRead(PatientDiagnosisCreate, PatientBase):
