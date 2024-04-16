@@ -5,7 +5,8 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from medrekk.admin.routes.accounts import account_routes, account_routes_verified
-from medrekk.auth.routes.auth import auth_routes
+from medrekk.admin.routes.users import user_routes
+from medrekk.admin.routes.auth import auth_routes
 from medrekk.common.database.connection import get_db
 from medrekk.common.controllers.init import init_db
 from medrekk.patient.routes import (
@@ -59,6 +60,7 @@ medrekk_app.include_router(auth_routes)
 
 medrekk_app.include_router(account_routes)
 medrekk_app.include_router(account_routes_verified)
+medrekk_app.include_router(user_routes)
 
 medrekk_app.include_router(patient_routes)
 medrekk_app.include_router(bodyweight_routes)
