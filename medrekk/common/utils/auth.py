@@ -11,8 +11,8 @@ from jose.constants import ALGORITHMS
 from sqlalchemy.orm import Session
 
 from medrekk.admin.schemas.accounts import UserRead
-from medrekk.auth.db.token import token_store
-from medrekk.auth.schemas.token import Token
+from medrekk.admin.db.token import token_store
+from medrekk.admin.schemas.token import Token
 from medrekk.common.database.connection import get_db
 from medrekk.common.dependencies import oauth2_scheme
 from medrekk.common.models.medrekk import MedRekkAccount
