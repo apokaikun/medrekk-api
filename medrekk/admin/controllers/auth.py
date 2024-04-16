@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from medrekk.admin.controllers.accounts import read_account, read_account_from_host
 from medrekk.admin.controllers.users import read_user_by_username
-from medrekk.auth.schemas.token import Token
+from medrekk.admin.schemas.token import Token
 from medrekk.common.utils.auth import generate_access_token, verify_password
 
 

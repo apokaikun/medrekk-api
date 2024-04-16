@@ -5,11 +5,11 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from medrekk.auth.controllers.auth import authenticate_user
+from medrekk.admin.controllers.auth import authenticate_user
 from medrekk.common.database.connection import get_db
 from medrekk.common.utils.auth import get_host
 from medrekk.schemas.responses import HTTP_EXCEPTION
-from medrekk.auth.schemas.token import Token
+from medrekk.admin.schemas.token import Token
 from medrekk.common.utils.constants import VERSION, VERSION_SUFFIX
 
 auth_routes = APIRouter(tags=["Authentication"])
