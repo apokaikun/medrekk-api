@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 
 from medrekk.admin.controllers.accounts import create_account
-from medrekk.patient.controllers.profile import create_patient
+from medrekk.mrs.controllers.profile import create_patient
 from medrekk.admin.schemas.accounts import AccountCreate
-from medrekk.patient.schemas.patients import PatientProfileCreate
+from medrekk.mrs.schemas.patients import PatientProfileCreate
 
 
 def init_db(db: Session):

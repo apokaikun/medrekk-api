@@ -17,7 +17,7 @@ auth_routes = APIRouter(tags=["Authentication"])
 # api_key_header = APIKeyHeader(name="X-API-Key")
 
 @auth_routes.post(
-    f"/{VERSION}-{VERSION_SUFFIX}/auth",
+    f"/auth",
     response_model=Token,
     status_code=200,
     description="Successful username and password authentication.",
