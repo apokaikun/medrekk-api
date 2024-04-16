@@ -9,7 +9,7 @@ from medrekk.admin.routes.users import user_routes
 from medrekk.admin.routes.auth import auth_routes
 from medrekk.common.database.connection import get_db
 from medrekk.common.controllers.init import init_db
-from medrekk.patient.routes import (
+from medrekk.mrs.routes import (
     allergy_routes,
     bloodpressure_routes,
     bmi_routes,
@@ -32,12 +32,12 @@ from medrekk.patient.routes import (
 
 VERSION = "202403"
 VERSION_SUFFIX = "pre-alpha"
-DOCS_URL = f"/{VERSION}-{VERSION_SUFFIX}/docs"
+# DOCS_URL = f"/api/{VERSION}-{VERSION_SUFFIX}/docs"
 
 medrekk_app = FastAPI(
     title="MedRekk",
     version=f"{VERSION}-{VERSION_SUFFIX}",
-    docs_url=DOCS_URL,
+    # docs_url=DOCS_URL,
     root_path=f"/api/{VERSION}-{VERSION_SUFFIX}",
     debug=True,
 )
@@ -46,7 +46,7 @@ medrekk_app = FastAPI(
 @medrekk_app.get("/")
 def root():
     # Redirects to docs URL for easier testing.
-    return RedirectResponse(url=DOCS_URL)
+    return RedirectResponse(url=medrekk_app.docs_url)
 
 
 @medrekk_app.get("/init")
