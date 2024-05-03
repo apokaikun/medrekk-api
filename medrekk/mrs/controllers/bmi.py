@@ -6,7 +6,10 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.common.models.patient import PatientBodyMassIndex
-from medrekk.mrs.schemas.patients import PatientBodyMassIndexCreate, PatientBodyMassIndexUpdate
+from medrekk.mrs.schemas.patients import (
+    PatientBodyMassIndexCreate,
+    PatientBodyMassIndexUpdate,
+)
 from medrekk.common.utils import shortid
 
 
@@ -26,21 +29,22 @@ def create_bmi(
 
         return new_bmi
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("uc_bmi_patient_date") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient cannot have multiple measurements "
-                            "for the same date. Date/Time: "
-                            f"{new_bmi.date_measured}"
-                        },
-                    },
-                )
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_uc_bmi_patient_date = args.find("uc_bmi_patient_date") >= 0
 
+        if isinstance(e.orig, UniqueViolation) and has_uc_bmi_patient_date:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient cannot have multiple measurements "
+                        "for the same date. Date/Time: "
+                        f"{new_bmi.date_measured}"
+                    },
+                },
+            )
+        raise e
 
 def read_bmi(
     patient_id: str,
@@ -98,7 +102,6 @@ def update_bmi(
     return bmi_db
 
 
-
 def delete_bmi(
     patient_id: str,
     bmi_id: str,
@@ -110,4 +113,3 @@ def delete_bmi(
     db.commit()
 
     return None
-

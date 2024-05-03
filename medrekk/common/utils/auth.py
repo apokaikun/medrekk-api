@@ -12,7 +12,6 @@ from sqlalchemy.orm import Session
 
 from medrekk.admin.schemas.accounts import UserRead
 from medrekk.admin.db.token import token_store
-from medrekk.admin.schemas.token import Token
 from medrekk.common.database.connection import get_db
 from medrekk.common.dependencies import oauth2_scheme
 from medrekk.common.models.medrekk import MedRekkAccount
@@ -23,7 +22,7 @@ from .constants import HMAC_KEY, JWT_KEY, TOKEN_EXPIRE_MINUTES
 
 def generate_access_token(
     user: UserRead, account: Optional[MedRekkAccount] = None
-) -> Token:
+) -> str:
 
     account_id = account.id if account else user.account_id
 
@@ -48,16 +47,19 @@ def generate_access_token(
 
 
 def verify_jwt_token(token: Annotated[str, Depends(oauth2_scheme)]) -> bool:
-    unverified = jwt.get_unverified_claims(token)
-    jti = unverified["jti"]
-    aud = token_store.get_token(jti=jti)
 
     try:
+        unverified = jwt.get_unverified_claims(token)
+        jti = unverified["jti"]
+        aud = token_store.get_token(jti=jti)
         return jwt.decode(token, JWT_KEY, algorithms=ALGORITHMS.HS256, audience=aud)
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token.",
+            detail={
+                "status_code": status.HTTP_401_UNAUTHORIZED,
+                "content": {"msg": f"Invalid token.", "loc": "Authorization"},
+            },
         )
 
 
@@ -80,9 +82,16 @@ def check_self(token: Annotated[str, Depends(oauth2_scheme)], user_id: str):
     sub = unverified.get("sub")
     if sub != user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized."
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "status_code": status.HTTP_403_FORBIDDEN,
+                "content": {
+                    "msg": "You don't have the necessary permissions to delete this account.",
+                    "loc": "user_id",
+                },
+            },
         )
-    return sub == user_id
+    return True
 
 
 def validate_password_strength(password):
@@ -132,7 +141,7 @@ def account_record_id_validate(
 ) -> str:
     """
     Validates record_id if it belongs to the account. Returns the record_id if `True`,
-    otherwise, it raises HTTPException of status 401 (Unauthorized).
+    otherwise, it raises HTTPException of status 403 (Forbidden).
     """
     record = (
         db.query(PatientRecord)
@@ -142,7 +151,13 @@ def account_record_id_validate(
     )
 
     if not record:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "msg": "You don't have the necessary permissions to access this record.",
+                "loc": "record_id",
+            },
+        )
 
     return record.id
 

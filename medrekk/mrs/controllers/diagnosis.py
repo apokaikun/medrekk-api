@@ -26,17 +26,6 @@ def create_patient_diagnosis(
         db.commit()
         db.refresh(new_diagnosis)
 
-        if not new_diagnosis:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail={
-                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    "content": {
-                        "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                    },
-                },
-            )
-
         return new_diagnosis
     except DBAPIError as e:
         if isinstance(e.orig, UniqueViolation):
@@ -51,16 +40,7 @@ def create_patient_diagnosis(
                         },
                     },
                 )
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+        raise e
 
 
 def read_patient_diagnosis(
@@ -92,24 +72,13 @@ def read_patient_diagnoses(
     record_id: str,
     db: Session,
 ) -> List[PatientDiagnosis]:
-    try:
-        diagnoses = (
-            db.query(PatientDiagnosis)
-            .filter(PatientDiagnosis.record_id == record_id)
-            .order_by(PatientDiagnosis.created.desc())
-            .all()
-        )
-        return diagnoses
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+    diagnoses = (
+        db.query(PatientDiagnosis)
+        .filter(PatientDiagnosis.record_id == record_id)
+        .order_by(PatientDiagnosis.created.desc())
+        .all()
+    )
+    return diagnoses
 
 
 def update_patient_diagnosis(
@@ -118,27 +87,16 @@ def update_patient_diagnosis(
     diagnosis: PatientDiagnosisUpdate,
     db: Session,
 ) -> PatientDiagnosis:
-    try:
-        diagnosis_db = read_patient_diagnosis(record_id, diagnosis_id, db)
+    diagnosis_db = read_patient_diagnosis(record_id, diagnosis_id, db)
 
-        for field, value in diagnosis.model_dump(exclude_unset=True).items():
-            setattr(diagnosis_db, field, value)
+    for field, value in diagnosis.model_dump(exclude_unset=True).items():
+        setattr(diagnosis_db, field, value)
 
-        db.add(diagnosis_db)
-        db.commit()
-        db.refresh(diagnosis_db)
+    db.add(diagnosis_db)
+    db.commit()
+    db.refresh(diagnosis_db)
 
-        return diagnosis_db
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+    return diagnosis_db
 
 
 def delete_patient_diagnosis(
@@ -146,20 +104,9 @@ def delete_patient_diagnosis(
     diagnosis_id: str,
     db: Session,
 ) -> None:
-    try:
-        diagnosis = read_patient_diagnosis(record_id, diagnosis_id, db)
+    diagnosis = read_patient_diagnosis(record_id, diagnosis_id, db)
 
-        db.delete(diagnosis)
-        db.commit()
+    db.delete(diagnosis)
+    db.commit()
 
-        return None
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+    return None

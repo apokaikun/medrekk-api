@@ -26,19 +26,22 @@ def create_allergy(
 
         return new_allergy
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("patient_id") >= 0:
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_patient_id = args.find("patient_id") >=0
+
+        if isinstance(e.orig, UniqueViolation) and has_patient_id:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail={
                         "status_code": status.HTTP_409_CONFLICT,
                         "content": {
-                            "msg": "Patient hospitalization history already exists."
+                            "msg": "Patient hospitalization history already exists.",
+                            "loc": "patient_id",
                         },
                     },
                 )
-
+        
+        raise e
 
 def read_allergy(
     patient_id: str,
@@ -57,7 +60,10 @@ def read_allergy(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": "Patient hospitalization history data NOT FOUND."},
+                "content": {
+                    "msg": "Patient hospitalization history data NOT FOUND.",
+                    "loc": "allergy_id",
+                },
             },
         )
 

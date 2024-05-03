@@ -18,37 +18,15 @@ def create_patient(
     db.commit()
     db.refresh(new_patient)
 
-    if not new_patient:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
-
     return new_patient
 
 
 def read_patients(
     db: Session,
 ) -> List[PatientProfile]:
-    try:
-        patients = db.query(PatientProfile).all()
+    patients = db.query(PatientProfile).all()
 
-        return patients
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+    return patients
 
 
 def read_patient(

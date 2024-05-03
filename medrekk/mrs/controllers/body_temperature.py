@@ -29,20 +29,23 @@ def create_bodytemp(
 
         return new_bodytemp
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args = e.orig.args[0]
-            if args.find("uc_bodytemperature_patient_dt"):
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient cannot have multiple measurements "
-                            "for the same date and time. Date/Time: "
-                            f"{new_bodytemp.dt_measured}"
-                        },
+        args: str = e.orig.args[0]
+
+        if isinstance(e.orig, UniqueViolation) and args.find(
+            "uc_bodytemperature_patient_dt"
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient cannot have multiple measurements "
+                        "for the same date and time. Date/Time: "
+                        f"{new_bodytemp.dt_measured}"
                     },
-                )
+                },
+            )
+        raise e
 
 
 def read_bodytemps(
@@ -81,11 +84,12 @@ def read_bodytemp(
         )
     return bodytemp
 
+
 def update_bodytemp(
-        record_id: str,
-        bodytemp_id: str,
-        bodytemp: PatientBodyTemperatureUpdate,
-        db: Session,
+    record_id: str,
+    bodytemp_id: str,
+    bodytemp: PatientBodyTemperatureUpdate,
+    db: Session,
 ) -> PatientBodyTemperature:
     bodytemp_db = read_bodytemp(record_id, bodytemp_id, db)
 
@@ -98,10 +102,11 @@ def update_bodytemp(
 
     return bodytemp_db
 
+
 def delete_bodytemp(
-        record_id: str,
-        bodytemp_id: str,
-        db: Session,
+    record_id: str,
+    bodytemp_id: str,
+    db: Session,
 ) -> None:
     bodytemp_db = read_bodytemp(record_id, bodytemp_id, db)
 

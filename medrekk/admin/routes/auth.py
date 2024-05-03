@@ -14,10 +14,9 @@ from medrekk.common.utils.constants import VERSION, VERSION_SUFFIX
 
 auth_routes = APIRouter(tags=["Authentication"])
 
-# api_key_header = APIKeyHeader(name="X-API-Key")
 
 @auth_routes.post(
-    f"/auth",
+    "/auth",
     response_model=Token,
     status_code=200,
     description="Successful username and password authentication.",
@@ -40,9 +39,6 @@ def auth(
     access_token = authenticate_user(host, form_data, db)
 
     return JSONResponse(
-        headers={
-            "WWW-Authenticate": f"Bearer {access_token}"
-        },
+        headers={"WWW-Authenticate": f"Bearer {access_token}"},
         content={"access_token": access_token, "token_type": "bearer"},
     )
-    # return {"access_token_": access_token, "token_type": "bearer"}

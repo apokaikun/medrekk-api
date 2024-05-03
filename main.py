@@ -29,6 +29,7 @@ from medrekk.mrs.routes import (
     respiratory_routes,
     surgical_history_routes,
 )
+from medrekk.schemas.responses import HTTP_EXCEPTION
 
 VERSION = "202403"
 VERSION_SUFFIX = "pre-alpha"
@@ -40,6 +41,12 @@ medrekk_app = FastAPI(
     # docs_url=DOCS_URL,
     root_path=f"/api/{VERSION}-{VERSION_SUFFIX}",
     debug=True,
+    responses={
+        500: {
+            "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+            "model": HTTP_EXCEPTION,
+        },
+    },
 )
 
 
@@ -53,7 +60,7 @@ def root():
 def root(init: bool, db: Annotated[Session, Depends(get_db)]):
     if init:
         init_db(db)
-    return RedirectResponse(url=DOCS_URL)
+    return RedirectResponse(url=medrekk_app.docs_url)
 
 
 medrekk_app.include_router(auth_routes)
@@ -79,7 +86,6 @@ medrekk_app.include_router(immunization_routes)
 
 medrekk_app.include_router(record_routes)
 medrekk_app.include_router(diagnosis_routes)
-# lab results
 medrekk_app.include_router(bloodpressure_routes)
 medrekk_app.include_router(heartrate_routes)
 medrekk_app.include_router(respiratory_routes)

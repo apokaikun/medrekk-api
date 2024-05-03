@@ -58,15 +58,7 @@ def add_account_user(
                     },
                 },
             )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+        raise e
 
 
 def read_user(
@@ -74,99 +66,59 @@ def read_user(
     user_id: int,
     db: Session,
 ) -> MedRekkUser:
-    try:
-        user = (
-            db.query(MedRekkUser)
-            .filter(MedRekkUser.account_id == account_id)
-            .filter(MedRekkUser.id == user_id)
-            .one_or_none()
-        )
+    user = (
+        db.query(MedRekkUser)
+        .filter(MedRekkUser.account_id == account_id)
+        .filter(MedRekkUser.id == user_id)
+        .one_or_none()
+    )
 
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail={
-                    "status_code": status.HTTP_404_NOT_FOUND,
-                    "content": {
-                        "msg": f"User is user_id:{user_id} does not exist.",
-                        "loc": "user_id",
-                    },
-                },
-            )
-
-        return user
-
-    except Exception:
+    if not user:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "status_code": status.HTTP_404_NOT_FOUND,
                 "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+                    "msg": f"User with user_id:{user_id} does not exist.",
+                    "loc": "user_id",
                 },
             },
         )
+
+    return user
 
 
 def read_user_by_username(
     username: str,
     db: Session,
 ) -> MedRekkUser:
-    try:
-        user = (
-            db.query(MedRekkUser)
-            .filter(MedRekkUser.username == username)
-            .one_or_none()
-        )
+    user = db.query(MedRekkUser).filter(MedRekkUser.username == username).one_or_none()
 
-        if user:
-            return user
+    if user:
+        return user
 
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={
-                "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {
-                    "msg": f"User `{username}` does not exist.",
-                    "loc": "username",
-                },
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail={
+            "status_code": status.HTTP_404_NOT_FOUND,
+            "content": {
+                "msg": f"User `{username}` does not exist.",
+                "loc": "username",
             },
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+        },
+    )
 
 
 def read_users(account_id: str, db: Session) -> List[MedRekkUser]:
-    try:
-        # select_stmt = select(MedRekkUser)
-        # users = db.scalars(select_stmt).all()
-        users = (
-            db.query(MedRekkUser).filter(MedRekkUser.account_id == account_id).all()
-        )
-        return users
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+    # select_stmt = select(MedRekkUser)
+    # users = db.scalars(select_stmt).all()
+    users = db.query(MedRekkUser).filter(MedRekkUser.account_id == account_id).all()
+    return users
 
 
-def update_user(db: Session, user_id: int, user: UserUpdate):
+def update_user(account_id: str, user_id: str, user: UserUpdate, db: Session):
+    db_user = read_user(account_id, user_id, db)
 
-    db_user = db.query(UserCreate).filter(UserCreate.id == user_id).first()
     for field, value in user.model_dump(exclude_unset=True).items():
         setattr(db_user, field, value)
 
@@ -176,23 +128,10 @@ def update_user(db: Session, user_id: int, user: UserUpdate):
     return db_user
 
 
-def delete_user(db: Session, user_id: int):
-    try:
-        select_stmt = select(MedRekkUser).where(MedRekkUser.id == user_id)
-        db_user = db.scalars(select_stmt).first()
-        db.delete(db_user)
-        db.commit()
-        return db_user
-    except Exception:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
+def delete_user(account_id: str, user_id: str, db: Session):
+    db_user = read_user(account_id, user_id, db)
+    db.delete(db_user)
+    db.commit()
 
 
 __all__ = [

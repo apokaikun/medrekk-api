@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
@@ -42,10 +42,6 @@ async def add_user(
     """
     Create a new user. Requires `email` and `password`
 
-    This is a new line:
-    --------------
-
-
     """
     user = add_account_user(account_id, user_data, db)
     if user is None:
@@ -64,6 +60,13 @@ Routes that requires a valid jwt_token
 @user_routes.get(
     "/",
     response_model=List[UserListItem],
+    status_code=status.HTTP_200_OK,
+    responses= {
+        500 : {
+            "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+            "model": HTTP_EXCEPTION,
+        },
+    }
 )
 async def get_users(
     account_id: Annotated[str, Depends(get_account_id)],
@@ -106,9 +109,7 @@ async def delete_user(
     db: Annotated[Session, Depends(get_db)],
 ):
     user = read_user(account_id, user_id, db)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
+    
     # Delete the user and return the deleted user
     db.delete(user)
     db.commit()

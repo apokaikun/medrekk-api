@@ -12,12 +12,12 @@ def authenticate_user(
     host: str,
     form_data: OAuth2PasswordRequestForm,
     db: Session,
-) -> Token:
+) -> str:
     user = read_user_by_username(form_data.username, db)
     if host.startswith("medrekk.com"):
         account = read_account(user.account_id, user.id, db)
     else:
-        account = read_account_from_host(host, db)
+        account = read_account_from_host(host, user.id, db)
     access_token = generate_access_token(user, account)
 
     if not verify_password(user.password, form_data.password):
