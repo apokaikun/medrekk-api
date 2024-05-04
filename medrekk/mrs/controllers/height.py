@@ -63,7 +63,10 @@ def read_height(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": "Patient height data NOT FOUND."},
+                "content": {
+                    "msg": "Patient height data NOT FOUND.",
+                    "loc": "height_id",
+                },
             },
         )
 
