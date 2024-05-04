@@ -30,7 +30,7 @@ def create_account(
             detail={
                 "status_code": status.HTTP_409_CONFLICT,
                 "content": {
-                    "msg": f"Account name '{account.account_name}' is already taken.",
+                    "msg": f"HTTP_409_CONFLICT. Account name '{account.account_name}' is already taken.",
                     "loc": "account_name",
                 },
             },
