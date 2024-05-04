@@ -81,6 +81,7 @@ def read_bodytemp(
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "content": {
                     "msg": f"Body temperature data NOT FOUND.",
+                    "loc": "bodytemp_id",
                 },
             },
         )
