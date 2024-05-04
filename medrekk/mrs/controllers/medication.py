@@ -62,7 +62,10 @@ def read_medication(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": "Patient medication history data NOT FOUND."},
+                "content": {
+                    "msg": "Patient medication history data NOT FOUND.",
+                    "loc": "medication_id",
+                },
             },
         )
 
