@@ -44,6 +44,7 @@ def create_patient_bloodpressure(
             )
         raise e
 
+
 def read_patient_bloodpressure(
     record_id: str,
     bp_id: str,
@@ -63,6 +64,7 @@ def read_patient_bloodpressure(
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "content": {
                     "msg": f"Blood pressure data NOT FOUND.",
+                    "loc": "bp_id",
                 },
             },
         )
