@@ -32,16 +32,16 @@ def create_patient_diagnosis(
         has_uc_record_diagnosis = args.find("uc_record_diagnosis") >= 0
 
         if isinstance(e.orig, UniqueViolation) and has_uc_record_diagnosis:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": f"Patient cannot have the same diagnosis in one record: {new_diagnosis.diagnosis_code}",
-                            "loc": "record_id"
-                        },
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": f"Patient cannot have the same diagnosis in one record: {new_diagnosis.diagnosis_code}",
+                        "loc": "record_id",
                     },
-                )
+                },
+            )
         raise e
 
 
@@ -64,6 +64,7 @@ def read_patient_diagnosis(
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "content": {
                     "msg": f"Diagnosis data NOT FOUND.",
+                    "loc": "diagnosis_id",
                 },
             },
         )
