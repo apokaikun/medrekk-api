@@ -26,7 +26,7 @@ def authenticate_user(
             detail={
                 "status_code": status.HTTP_401_UNAUTHORIZED,
                 "content": {
-                    "msg": f"Invalid credentials for {form_data.username}.",
+                    "msg": f"HTTP_401_UNAUTHORIZED. Invalid credentials for {form_data.username}.",
                     "loc": "[username, password]",
                 },
             },
