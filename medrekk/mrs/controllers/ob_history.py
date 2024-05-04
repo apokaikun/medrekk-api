@@ -34,7 +34,10 @@ def create_ob_history(
                 status_code=status.HTTP_409_CONFLICT,
                 detail={
                     "status_code": status.HTTP_409_CONFLICT,
-                    "content": {"msg": "Patient ob history already exists.", "loc": "patient_id"},
+                    "content": {
+                        "msg": "Patient ob history already exists.",
+                        "loc": "patient_id",
+                    },
                 },
             )
 
@@ -54,7 +57,10 @@ def read_ob_history(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": "Patient ob history data NOT FOUND."},
+                "content": {
+                    "msg": "Patient ob history data NOT FOUND.",
+                    "loc": "patient_id",
+                },
             },
         )
 
