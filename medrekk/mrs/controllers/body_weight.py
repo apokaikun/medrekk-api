@@ -67,6 +67,7 @@ def read_bodyweight(
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "content": {
                     "msg": f"Body weight data NOT FOUND.",
+                    "loc": "bodyweight_id",
                 },
             },
         )
