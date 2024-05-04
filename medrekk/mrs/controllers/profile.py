@@ -42,6 +42,7 @@ def read_patient(
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "content": {
                     "msg": f"Patient with ID: {patient_id} is not found. Please",
+                    "loc": "patient_id",
                 },
             },
         )
