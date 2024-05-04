@@ -41,7 +41,7 @@ def create_family_history(
                     },
                 },
             )
-        
+
         raise e
 
 
@@ -60,7 +60,10 @@ def read_family_history(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": "Patient family history data NOT FOUND."},
+                "content": {
+                    "msg": "Patient family history data NOT FOUND.",
+                    "loc": "patient_id",
+                },
             },
         )
 
