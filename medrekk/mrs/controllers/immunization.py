@@ -64,7 +64,10 @@ def read_immunization(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": "Patient immunization history data NOT FOUND."},
+                "content": {
+                    "msg": "Patient immunization history data NOT FOUND.",
+                    "loc": "immunization_id",
+                },
             },
         )
 
