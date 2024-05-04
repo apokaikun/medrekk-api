@@ -81,6 +81,7 @@ def read_respiratory(
                 "status_code": status.HTTP_404_NOT_FOUND,
                 "content": {
                     "msg": f"Respiratory rate data NOT FOUND.",
+                    "loc": "respiratory_id",
                 },
             },
         )
