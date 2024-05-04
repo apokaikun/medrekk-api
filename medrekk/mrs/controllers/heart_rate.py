@@ -60,7 +60,10 @@ def read_patient_heartrate(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={
                 "status_code": status.HTTP_404_NOT_FOUND,
-                "content": {"msg": f"Heart rate data NOT FOUND."},
+                "content": {
+                    "msg": f"Heart rate data NOT FOUND.",
+                    "loc": "heartrate_id",
+                },
             },
         )
 
