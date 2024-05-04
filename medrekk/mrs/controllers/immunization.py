@@ -6,7 +6,10 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.common.models.patient import PatientImmunization
-from medrekk.mrs.schemas.patients import PatientImmunizationCreate, PatientImmunizationUpdate
+from medrekk.mrs.schemas.patients import (
+    PatientImmunizationCreate,
+    PatientImmunizationUpdate,
+)
 from medrekk.common.utils import shortid
 
 
@@ -26,18 +29,22 @@ def create_immunization(
 
         return new_immunization
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("patient_id") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient immunization history already exists."
-                        },
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_patient_id = args.find("patient_id") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_patient_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient immunization history already exists.",
+                        "loc": "patient_id",
                     },
-                )
+                },
+            )
+
+        raise e
 
 
 def read_immunization(
@@ -96,7 +103,6 @@ def update_immunization(
     return immunization_db
 
 
-
 def delete_immunization(
     patient_id: str,
     immunization_id: str,
@@ -108,4 +114,3 @@ def delete_immunization(
     db.commit()
 
     return None
-

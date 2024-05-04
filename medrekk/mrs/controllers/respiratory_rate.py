@@ -29,20 +29,24 @@ def create_respiratory(
 
         return new_respiratory
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("uc_respiratoryrate_patient_dt"):
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient cannot have multiple measurements "
-                            "for the same date and time. Date/Time: "
-                            f"{new_respiratory.dt_measured}"
-                        },
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_uc_respiratoryrate_patient_dt = (
+            args.find("uc_respiratoryrate_patient_dt") >= 0
+        )
+
+        if isinstance(e.orig, UniqueViolation) and has_uc_respiratoryrate_patient_dt:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient cannot have multiple measurements "
+                        "for the same date and time. Date/Time: "
+                        f"{new_respiratory.dt_measured}",
+                        "loc": "dt_measured",
                     },
-                )
+                },
+            )
 
 
 def read_respiratories(

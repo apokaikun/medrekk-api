@@ -26,18 +26,17 @@ def create_ob_history(
 
         return new_ob_history
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("patient_id") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient ob history already exists."
-                        },
-                    },
-                )
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_patient_id = args.find("patient_id") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_patient_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {"msg": "Patient ob history already exists.", "loc": "patient_id"},
+                },
+            )
 
 
 def read_ob_history(
@@ -79,7 +78,6 @@ def update_ob_history(
     return ob_history_db
 
 
-
 def delete_ob_history(
     patient_id: str,
     db: Session,
@@ -90,4 +88,3 @@ def delete_ob_history(
     db.commit()
 
     return None
-

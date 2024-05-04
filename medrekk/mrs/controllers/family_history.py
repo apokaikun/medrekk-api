@@ -27,16 +27,22 @@ def create_family_history(
 
         return new_family_history
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("patient_id") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {"msg": "Patient family history already exists."},
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_patient_id = args.find("patient_id") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_patient_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient family history already exists.",
+                        "loc": "patient_id",
                     },
-                )
+                },
+            )
+        
+        raise e
 
 
 def read_family_history(

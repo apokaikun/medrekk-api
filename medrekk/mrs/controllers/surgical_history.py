@@ -7,7 +7,10 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.common.models.patient import PatientSurgicalHistory
-from medrekk.mrs.schemas.patients import PatientSurgicalHistoryCreate, PatientSurgicalHistoryUpdate
+from medrekk.mrs.schemas.patients import (
+    PatientSurgicalHistoryCreate,
+    PatientSurgicalHistoryUpdate,
+)
 from medrekk.common.utils import shortid
 
 
@@ -27,18 +30,20 @@ def create_surgical_history(
 
         return new_surgical_history
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("patient_id") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient surgical history already exists."
-                        },
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_patient_id = args.find("patient_id") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_patient_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient surgical history already exists.",
+                        "loc": "patient_id",
                     },
-                )
+                },
+            )
 
 
 def read_surgical_history(
@@ -91,13 +96,12 @@ def update_surgical_history(
         setattr(surgical_history_db, field, value)
 
     surgical_history_db.updated = datetime.now()
-    
+
     db.add(surgical_history_db)
     db.commit()
     db.refresh(surgical_history_db)
 
     return surgical_history_db
-
 
 
 def delete_surgical_history(
@@ -111,4 +115,3 @@ def delete_surgical_history(
     db.commit()
 
     return None
-

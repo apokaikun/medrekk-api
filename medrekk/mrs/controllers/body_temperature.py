@@ -29,11 +29,12 @@ def create_bodytemp(
 
         return new_bodytemp
     except DBAPIError as e:
-        args: str = e.orig.args[0]
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_uc_bodytemperature_patient_dt = (
+            args.find("uc_bodytemperature_patient_dt") >= 0
+        )
 
-        if isinstance(e.orig, UniqueViolation) and args.find(
-            "uc_bodytemperature_patient_dt"
-        ):
+        if isinstance(e.orig, UniqueViolation) and has_uc_bodytemperature_patient_dt:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail={
@@ -41,7 +42,8 @@ def create_bodytemp(
                     "content": {
                         "msg": "Patient cannot have multiple measurements "
                         "for the same date and time. Date/Time: "
-                        f"{new_bodytemp.dt_measured}"
+                        f"{new_bodytemp.dt_measured}",
+                        "loc": "dt_measured",
                     },
                 },
             )

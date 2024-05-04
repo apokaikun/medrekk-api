@@ -40,7 +40,8 @@ def create_bmi(
                     "content": {
                         "msg": "Patient cannot have multiple measurements "
                         "for the same date. Date/Time: "
-                        f"{new_bmi.date_measured}"
+                        f"{new_bmi.date_measured}",
+                        "loc": "date_measured",
                     },
                 },
             )

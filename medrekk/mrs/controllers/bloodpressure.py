@@ -42,7 +42,7 @@ def create_patient_bloodpressure(
                     },
                 },
             )
-
+        raise e
 
 def read_patient_bloodpressure(
     record_id: str,

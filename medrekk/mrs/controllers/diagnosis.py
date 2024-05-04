@@ -28,15 +28,17 @@ def create_patient_diagnosis(
 
         return new_diagnosis
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("uc_record_diagnosis"):
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_uc_record_diagnosis = args.find("uc_record_diagnosis") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_uc_record_diagnosis:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail={
                         "status_code": status.HTTP_409_CONFLICT,
                         "content": {
-                            "msg": f"Patient cannot have the same diagnosis in one record: {new_diagnosis.diagnosis_code}"
+                            "msg": f"Patient cannot have the same diagnosis in one record: {new_diagnosis.diagnosis_code}",
+                            "loc": "record_id"
                         },
                     },
                 )

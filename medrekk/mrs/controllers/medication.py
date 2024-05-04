@@ -6,7 +6,10 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.common.models.patient import PatientMedication
-from medrekk.mrs.schemas.patients import PatientMedicationCreate, PatientMedicationUpdate
+from medrekk.mrs.schemas.patients import (
+    PatientMedicationCreate,
+    PatientMedicationUpdate,
+)
 from medrekk.common.utils import shortid
 
 
@@ -26,18 +29,20 @@ def create_medication(
 
         return new_medication
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("patient_id") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient medication history already exists."
-                        },
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_patient_id = args.find("patient_id") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_patient_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient medication history already exists.",
+                        "loc": "patient_id",
                     },
-                )
+                },
+            )
 
 
 def read_medication(
@@ -96,7 +101,6 @@ def update_medication(
     return medication_db
 
 
-
 def delete_medication(
     patient_id: str,
     medication_id: str,
@@ -108,4 +112,3 @@ def delete_medication(
     db.commit()
 
     return None
-

@@ -29,20 +29,23 @@ def create_bodyweight(
 
         return new_weight
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("uc_bodyweight_patient_date"):
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient cannot have multiple measurements "
-                            "for the same date and time. Date: "
-                            f"{new_weight.date_measured}"
-                        },
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_uc_bodyweight_patient_date = args.find("uc_bodyweight_patient_date") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_uc_bodyweight_patient_date:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient cannot have multiple measurements "
+                        "for the same date and time. Date: "
+                        f"{new_weight.date_measured}",
+                        "loc": "date_measured",
                     },
-                )
+                },
+            )
+        raise e
 
 
 def read_bodyweight(
@@ -83,11 +86,12 @@ def read_bodyweights(
 
     return bodyweights
 
+
 def update_bodyweight(
-        patient_id: str,
-        bodyweight_id: str,
-        bodyweight: PatientBodyWeightUpdate,
-        db: Session,
+    patient_id: str,
+    bodyweight_id: str,
+    bodyweight: PatientBodyWeightUpdate,
+    db: Session,
 ) -> PatientBodyWeight:
     bodyweight_db = read_bodyweight(patient_id, bodyweight_id, db)
 
@@ -100,10 +104,11 @@ def update_bodyweight(
 
     return bodyweight_db
 
+
 def delete_bodyweight(
-        patient_id: str,
-        bodyweight_id: str,
-        db: Session,
+    patient_id: str,
+    bodyweight_id: str,
+    db: Session,
 ) -> None:
     bodyweight_db = read_bodyweight(patient_id, bodyweight_id, db)
 

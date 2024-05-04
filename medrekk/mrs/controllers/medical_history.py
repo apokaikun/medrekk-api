@@ -6,7 +6,10 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.common.models.patient import PatientMedicalHistory
-from medrekk.mrs.schemas.patients import PatientMedicalHistoryCreate, PatientMedicalHistoryUpdate
+from medrekk.mrs.schemas.patients import (
+    PatientMedicalHistoryCreate,
+    PatientMedicalHistoryUpdate,
+)
 from medrekk.common.utils import shortid
 
 
@@ -26,18 +29,22 @@ def create_medical_history(
 
         return new_medical_history
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("patient_id") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient medical history already exists."
-                        },
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_patient_id = args.find("patient_id") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_patient_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient medical history already exists.",
+                        "loc": "patient_id",
                     },
-                )
+                },
+            )
+
+        raise e
 
 
 def read_medical_history(
@@ -79,7 +86,6 @@ def update_medical_history(
     return medical_history_db
 
 
-
 def delete_medical_history(
     patient_id: str,
     db: Session,
@@ -90,4 +96,3 @@ def delete_medical_history(
     db.commit()
 
     return None
-

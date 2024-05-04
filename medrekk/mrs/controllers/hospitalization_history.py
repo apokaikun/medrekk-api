@@ -6,7 +6,10 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.common.models.patient import PatientHospitalizationHistory
-from medrekk.mrs.schemas.patients import PatientHospitalizationHistoryCreate, PatientHospitalizationHistoryUpdate
+from medrekk.mrs.schemas.patients import (
+    PatientHospitalizationHistoryCreate,
+    PatientHospitalizationHistoryUpdate,
+)
 from medrekk.common.utils import shortid
 
 
@@ -16,7 +19,9 @@ def create_hospitalization_history(
     db: Session,
 ) -> PatientHospitalizationHistory:
     try:
-        new_hospitalization_history = PatientHospitalizationHistory(**hospitalization_history.model_dump())
+        new_hospitalization_history = PatientHospitalizationHistory(
+            **hospitalization_history.model_dump()
+        )
         new_hospitalization_history.id = shortid()
         new_hospitalization_history.patient_id = patient_id
 
@@ -26,18 +31,22 @@ def create_hospitalization_history(
 
         return new_hospitalization_history
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("patient_id") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient hospitalization history already exists."
-                        },
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_patient_id = args.find("patient_id") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_patient_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient hospitalization history already exists.",
+                        "loc": "patient_id",
                     },
-                )
+                },
+            )
+
+        raise e
 
 
 def read_hospitalization_history(
@@ -84,7 +93,9 @@ def update_hospitalization_history(
     hospitalization_history: PatientHospitalizationHistoryUpdate,
     db: Session,
 ) -> PatientHospitalizationHistory:
-    hospitalization_history_db = read_hospitalization_history(patient_id, hospitalization_history_id, db)
+    hospitalization_history_db = read_hospitalization_history(
+        patient_id, hospitalization_history_id, db
+    )
 
     for field, value in hospitalization_history.model_dump(exclude_unset=True).items():
         setattr(hospitalization_history_db, field, value)
@@ -96,16 +107,16 @@ def update_hospitalization_history(
     return hospitalization_history_db
 
 
-
 def delete_hospitalization_history(
     patient_id: str,
     hospitalization_history_id: str,
     db: Session,
 ) -> None:
-    hospitalization_history_db = read_hospitalization_history(patient_id, hospitalization_history_id, db)
+    hospitalization_history_db = read_hospitalization_history(
+        patient_id, hospitalization_history_id, db
+    )
 
     db.delete(hospitalization_history_db)
     db.commit()
 
     return None
-

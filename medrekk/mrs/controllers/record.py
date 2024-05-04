@@ -1,6 +1,4 @@
 from typing import List
-from psycopg.errors import UniqueViolation
-from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from medrekk.common.models.patient import PatientRecord

@@ -26,20 +26,24 @@ def create_height(
 
         return new_height
     except DBAPIError as e:
-        if isinstance(e.orig, UniqueViolation):
-            args: str = e.orig.args[0]
-            if args.find("uc_height_patient_date") >= 0:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail={
-                        "status_code": status.HTTP_409_CONFLICT,
-                        "content": {
-                            "msg": "Patient cannot have multiple measurements "
-                            "for the same date. Date/Time: "
-                            f"{new_height.date_measured}"
-                        },
+        args: str = e.orig.args[0] if e.orig.args else ""
+        has_uc_height_patient_date = args.find("uc_height_patient_date") >= 0
+
+        if isinstance(e.orig, UniqueViolation) and has_uc_height_patient_date:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "status_code": status.HTTP_409_CONFLICT,
+                    "content": {
+                        "msg": "Patient cannot have multiple measurements "
+                        "for the same date. Date/Time: "
+                        f"{new_height.date_measured}",
+                        "loc": "date_measured",
                     },
-                )
+                },
+            )
+
+        raise e
 
 
 def read_height(
@@ -98,7 +102,6 @@ def update_height(
     return height_db
 
 
-
 def delete_height(
     patient_id: str,
     height_id: str,
@@ -110,4 +113,3 @@ def delete_height(
     db.commit()
 
     return None
-
