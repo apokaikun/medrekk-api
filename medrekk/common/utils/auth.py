@@ -58,7 +58,10 @@ def verify_jwt_token(token: Annotated[str, Depends(oauth2_scheme)]) -> bool:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
                 "status_code": status.HTTP_401_UNAUTHORIZED,
-                "content": {"msg": f"Invalid token.", "loc": "Authorization"},
+                "content": {
+                    "msg": f"Invalid token.",
+                    "loc": "Authorization",
+                },
             },
         )
 
