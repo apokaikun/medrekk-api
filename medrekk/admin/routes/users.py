@@ -16,6 +16,12 @@ user_routes = APIRouter(
     prefix=f"/{routes.MEMBERS}",
     dependencies=[Depends(verify_jwt_token)],
     tags=["Account Users"],
+    responses={
+        500: {
+            "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+            "model": HTTP_EXCEPTION,
+        },
+    },
 )
 
 
@@ -26,10 +32,6 @@ user_routes = APIRouter(
     responses={
         409: {
             "description": "HTTP_409_CONFLICT. There is an error in creating the user.",
-            "model": HTTP_EXCEPTION,
-        },
-        500: {
-            "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
             "model": HTTP_EXCEPTION,
         },
     },
@@ -61,12 +63,12 @@ Routes that requires a valid jwt_token
     "/",
     response_model=List[UserListItem],
     status_code=status.HTTP_200_OK,
-    responses= {
-        500 : {
+    responses={
+        500: {
             "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
             "model": HTTP_EXCEPTION,
         },
-    }
+    },
 )
 async def get_users(
     account_id: Annotated[str, Depends(get_account_id)],
@@ -109,7 +111,7 @@ async def delete_user(
     db: Annotated[Session, Depends(get_db)],
 ):
     user = read_user(account_id, user_id, db)
-    
+
     # Delete the user and return the deleted user
     db.delete(user)
     db.commit()
