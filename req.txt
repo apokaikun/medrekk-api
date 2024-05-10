@@ -1,0 +1,11 @@
+bcrypt
+fastapi
+psycopg[binary]
+psycopg[pool]
+python-jose
+python-multipart
+redis
+shortuuid
+SQLAlchemy
+uvicorn
+pydantic[email]
