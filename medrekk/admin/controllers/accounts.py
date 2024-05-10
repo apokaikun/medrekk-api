@@ -38,7 +38,7 @@ def create_account(
 
     new_account = MedRekkAccount(
         account_name=account_name,
-        account_subdomain="-".join(account_name.split()),
+        account_subdomain="-".join(account_name.lower().split()),
         id=shortid(),
     )
 
