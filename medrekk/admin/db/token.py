@@ -3,7 +3,7 @@ from redis import Redis
 
 from medrekk.common.utils.constants import TOKEN_EXPIRE_MINUTES
 
-token_db = Redis(host='localhost', port=6379, decode_responses=True, db=0)
+token_db = Redis(host='10.76.6.73', port=6379, decode_responses=True, db=0)
 
 class TokenStorage:
     def __init__(self, db: Redis) -> None:
