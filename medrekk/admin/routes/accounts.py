@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from medrekk.admin.controllers.accounts import create_account, read_account
@@ -13,6 +14,12 @@ from medrekk.common.utils.auth import get_account_id, get_user_id, verify_jwt_to
 account_routes = APIRouter(
     prefix=f"/{routes.ACCOUNTS}",
     tags=["Accounts"],
+    responses={
+        500: {
+            "description": "HTTP_500_INTERNAL_SERVER_ERROR. The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+            "model": HTTP_EXCEPTION,
+        },
+    },
 )
 
 
@@ -33,7 +40,7 @@ async def new_account(
     db: Annotated[Session, Depends(get_db)],
 ):
     new_account = create_account(account, db)
-    return AccountRead.model_validate(new_account)
+    return new_account
 
 
 account_routes_verified = APIRouter(
@@ -44,8 +51,8 @@ account_routes_verified = APIRouter(
         401: {
             "description": "This message indicates that you tried to access a resource that requires authorization, but your credentials (username/password OR token) were not recognized by the server.",
             "model": HTTP_EXCEPTION,
-        },
-    }
+        }
+    },
 )
 
 
