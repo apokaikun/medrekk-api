@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from medrekk.admin.schemas.accounts import UserRead
 from medrekk.admin.db.token import token_store
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_db, get_session
 from medrekk.common.dependencies import oauth2_scheme
 from medrekk.common.models.medrekk import MedRekkAccount
 from medrekk.common.models.patient import PatientRecord
@@ -140,14 +140,14 @@ def verify_password(hashed: str, input: str):
 def account_record_id_validate(
     record_id: str,
     account_id: Annotated[str, Depends(get_account_id)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ) -> str:
     """
     Validates record_id if it belongs to the account. Returns the record_id if `True`,
     otherwise, it raises HTTPException of status 403 (Forbidden).
     """
     record = (
-        db.query(PatientRecord)
+        db_session.query(PatientRecord)
         .filter(PatientRecord.id == record_id)
         .filter(PatientRecord.account_id == account_id)
         .one_or_none()
