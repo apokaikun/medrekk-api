@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.heart_rate import (
     read_patient_heartrates,
     update_patient_heartrate,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.schemas.patients import (
     PatientHeartRateCreate,
     PatientHeartRateRead,
@@ -37,9 +37,9 @@ heartrate_routes = APIRouter(
 async def add_patient_heartrate(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     heartrate: PatientHeartRateCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_heartrate = create_patient_heartrate(record_id, heartrate, db)
+    new_heartrate = create_patient_heartrate(record_id, heartrate, db_session)
 
     return PatientHeartRateRead.model_validate(new_heartrate)
 
@@ -51,9 +51,9 @@ async def add_patient_heartrate(
 )
 async def get_patient_heartrates(
     record_id: Annotated[str, Depends(account_record_id_validate)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    patient_heartrates = read_patient_heartrates(record_id, db)
+    patient_heartrates = read_patient_heartrates(record_id, db_session)
 
     return [
         PatientHeartRateRead.model_validate(heartrate)
@@ -69,9 +69,9 @@ async def get_patient_heartrates(
 async def get_patient_heartrate(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     heartrate_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    patient_heartrate = read_patient_heartrate(record_id, heartrate_id, db)
+    patient_heartrate = read_patient_heartrate(record_id, heartrate_id, db_session)
 
     return PatientHeartRateRead.model_validate(patient_heartrate)
 
@@ -85,9 +85,9 @@ async def put_patient_heartrate(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     heartrate_id: str,
     heartrate: PatientHeartRateUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_heartrate = update_patient_heartrate(record_id, heartrate_id, heartrate, db)
+    updated_heartrate = update_patient_heartrate(record_id, heartrate_id, heartrate, db_session)
 
     return PatientHeartRateRead.model_validate(updated_heartrate)
 
@@ -100,6 +100,6 @@ async def put_patient_heartrate(
 async def delete_heartrate(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     heartrate_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_patient_heartrate(record_id, heartrate_id, db)
+    return delete_patient_heartrate(record_id, heartrate_id, db_session)
