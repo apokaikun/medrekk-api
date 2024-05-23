@@ -9,7 +9,7 @@ from medrekk.mrs.controllers.family_history import (
     read_family_history,
     update_family_history,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.schemas.patients import (
     PatientFamilyHistoryCreate,
     PatientFamilyHistoryRead,
@@ -33,9 +33,9 @@ family_history_routes = APIRouter(
 async def add_patient_family_history(
     patient_id: str,
     family_history: PatientFamilyHistoryCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_family_history = create_family_history(patient_id, family_history, db)
+    new_family_history = create_family_history(patient_id, family_history, db_session)
 
     return new_family_history
 
@@ -46,9 +46,9 @@ async def add_patient_family_history(
 )
 async def get_patient_family_history(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    family_history = read_family_history(patient_id, db)
+    family_history = read_family_history(patient_id, db_session)
 
     return family_history
 
@@ -59,9 +59,9 @@ async def get_patient_family_history(
 async def update_patient_family_history(
     patient_id: str,
     family_history: PatientFamilyHistoryUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_family_history = update_family_history(patient_id, family_history, db)
+    updated_family_history = update_family_history(patient_id, family_history, db_session)
 
     return updated_family_history
 
@@ -71,6 +71,6 @@ async def update_patient_family_history(
 )
 async def delete_patient_family_history(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_family_history(patient_id, db)
+    return delete_family_history(patient_id, db_session)
