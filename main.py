@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from medrekk.admin.routes.accounts import account_routes, account_routes_verified
 from medrekk.admin.routes.users import user_routes
 from medrekk.admin.routes.auth import auth_routes
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_session
 from medrekk.common.controllers.init import init_db
 from medrekk.mrs.routes import (
     allergy_routes,
@@ -57,9 +57,9 @@ def root():
 
 
 @medrekk_app.get("/init")
-def root(init: bool, db: Annotated[Session, Depends(get_db)]):
+def root(init: bool, db_session: Annotated[Session, Depends(get_session)]):
     if init:
-        init_db(db)
+        init_db(db_session)
     return RedirectResponse(url=medrekk_app.docs_url)
 
 
