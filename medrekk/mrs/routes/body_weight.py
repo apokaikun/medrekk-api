@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.body_weight import (
     read_bodyweights,
     update_bodyweight,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.schemas.patients import (
     PatientBodyWeightCreate,
     PatientBodyWeightRead,
@@ -34,9 +34,9 @@ bodyweight_routes = APIRouter(
 async def add_patient_bodyweight(
     patient_id: str,
     bodyweight: PatientBodyWeightCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_bodyweight = create_bodyweight(patient_id, bodyweight, db)
+    new_bodyweight = create_bodyweight(patient_id, bodyweight, db_session)
 
     return new_bodyweight
 
@@ -47,9 +47,9 @@ async def add_patient_bodyweight(
 )
 async def get_patient_bodyweights(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    bodyweights = read_bodyweights(patient_id, db)
+    bodyweights = read_bodyweights(patient_id, db_session)
 
     return bodyweights
 
@@ -61,9 +61,9 @@ async def get_patient_bodyweights(
 async def get_patient_bodyweight(
     patient_id: str,
     bodyweight_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    bodyweight = read_bodyweight(patient_id, bodyweight_id, db)
+    bodyweight = read_bodyweight(patient_id, bodyweight_id, db_session)
 
     return bodyweight
 
@@ -73,9 +73,9 @@ async def update_patient_bodyweight(
     patient_id: str,
     bodyweight_id: str,
     bodyweight: PatientBodyWeightUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_bodyweight = update_bodyweight(patient_id, bodyweight_id, bodyweight, db)
+    updated_bodyweight = update_bodyweight(patient_id, bodyweight_id, bodyweight, db_session)
 
     return updated_bodyweight
 
@@ -87,6 +87,6 @@ async def update_patient_bodyweight(
 async def delete_patient_bodyweight(
     patient_id: str,
     bodyweight_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_bodyweight(patient_id, bodyweight_id, db)
+    return delete_bodyweight(patient_id, bodyweight_id, db_session)
