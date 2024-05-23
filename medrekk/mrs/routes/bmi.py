@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.bmi import (
     read_bmis,
     update_bmi,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_session
 from medrekk.mrs.schemas.patients import (
     PatientBodyMassIndexCreate,
     PatientBodyMassIndexRead,
@@ -34,9 +34,9 @@ bmi_routes = APIRouter(
 async def add_patient_bmi(
     patient_id: str,
     bmi: PatientBodyMassIndexCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_bmi = create_bmi(patient_id, bmi, db)
+    new_bmi = create_bmi(patient_id, bmi, db_session)
 
     return new_bmi
 
@@ -46,9 +46,9 @@ async def add_patient_bmi(
 )
 async def get_patient_bmis(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)]
+    db_session: Annotated[Session, Depends(get_session)]
 ):
-    bmis = read_bmis(patient_id, db)
+    bmis = read_bmis(patient_id, db_session)
 
     return bmis
 
@@ -59,9 +59,9 @@ async def get_patient_bmis(
 async def get_patient_bmi(
     patient_id: str,
     bmi_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    bmi = read_bmi(patient_id, bmi_id, db)
+    bmi = read_bmi(patient_id, bmi_id, db_session)
 
     return bmi
 
@@ -73,9 +73,9 @@ async def update_patient_bmi(
     patient_id: str,
     bmi_id: str,
     bmi: PatientBodyMassIndexUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_bmi = update_bmi(patient_id, bmi_id, bmi, db)
+    updated_bmi = update_bmi(patient_id, bmi_id, bmi, db_session)
 
     return updated_bmi
 
@@ -86,6 +86,6 @@ async def update_patient_bmi(
 async def delete_patient_bmi(
     patient_id: str,
     bmi_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_bmi(patient_id, bmi_id, db)
+    return delete_bmi(patient_id, bmi_id, db_session)
