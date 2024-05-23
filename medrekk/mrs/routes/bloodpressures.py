@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.bloodpressure import (
     read_patient_bloodpressures,
     update_patient_bloodpressure,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.schemas.patients import (
     PatientBloodPressureCreate,
     PatientBloodPressureRead,
@@ -36,9 +36,9 @@ bloodpressure_routes = APIRouter(
 async def add_bloodpressure(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     patient_bp: PatientBloodPressureCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_bp = create_patient_bloodpressure(record_id, patient_bp, db)
+    new_bp = create_patient_bloodpressure(record_id, patient_bp, db_session)
 
     return PatientBloodPressureRead.model_validate(new_bp)
 
@@ -50,9 +50,9 @@ async def add_bloodpressure(
 )
 async def get_bloodpressures(
     record_id: Annotated[str, Depends(account_record_id_validate)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    patient_bps = read_patient_bloodpressures(record_id, db)
+    patient_bps = read_patient_bloodpressures(record_id, db_session)
 
     validated = []
     for bp in patient_bps:
@@ -69,9 +69,9 @@ async def get_bloodpressures(
 async def get_bloodpressure(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     bp_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    patient_bp = read_patient_bloodpressure(record_id, bp_id, db)
+    patient_bp = read_patient_bloodpressure(record_id, bp_id, db_session)
 
     return PatientBloodPressureRead.model_validate(patient_bp)
 
@@ -85,9 +85,9 @@ async def put_bloodpressure(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     bp_id: str,
     bp: PatientBloodPressureUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    patient_bp = update_patient_bloodpressure(record_id, bp_id, bp, db)
+    patient_bp = update_patient_bloodpressure(record_id, bp_id, bp, db_session)
 
     return PatientBloodPressureRead.model_validate(patient_bp)
 
@@ -99,9 +99,9 @@ async def put_bloodpressure(
 async def delete_bloodpressure(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     bp_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_patient_bloodpressure(record_id, bp_id, db)
+    return delete_patient_bloodpressure(record_id, bp_id, db_session)
 
 
 # END : Blood Pressure
