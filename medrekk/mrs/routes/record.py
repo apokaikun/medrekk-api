@@ -3,6 +3,9 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from medrekk.common.database.connection import get_session
+from medrekk.common.utils import routes
+from medrekk.common.utils.auth import get_account_id, verify_jwt_token
 from medrekk.mrs.controllers.record import (
     create_record,
     delete_record,
@@ -10,10 +13,11 @@ from medrekk.mrs.controllers.record import (
     read_records,
     update_record,
 )
-from medrekk.common.database.connection import get_db
-from medrekk.mrs.schemas.patients import PatientRecordCreate, PatientRecordRead, PatientRecordUpdate
-from medrekk.common.utils import routes
-from medrekk.common.utils.auth import get_account_id, verify_jwt_token
+from medrekk.mrs.schemas.patients import (
+    PatientRecordCreate,
+    PatientRecordRead,
+    PatientRecordUpdate,
+)
 
 record_routes = APIRouter(
     prefix=f"/{routes.PATIENTS}" + "/{patient_id}" + f"/{routes.RECORDS}",
@@ -32,9 +36,9 @@ async def add_record(
     patient_id: str,
     account_id: Annotated[str, Depends(get_account_id)],
     record: PatientRecordCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_record = create_record(account_id, patient_id, record, db)
+    new_record = create_record(account_id, patient_id, record, db_session)
 
     return new_record
 
@@ -47,9 +51,9 @@ async def add_record(
 async def get_records(
     patient_id: str,
     account_id: Annotated[str, Depends(get_account_id)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    records = read_records(account_id, patient_id, db)
+    records = read_records(account_id, patient_id, db_session)
 
     return [PatientRecordRead.model_validate(record) for record in records]
 
@@ -63,9 +67,9 @@ async def get_record(
     patient_id: str,
     record_id: str,
     account_id: Annotated[str, Depends(get_account_id)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    record = read_record(account_id, patient_id, record_id, db)
+    record = read_record(account_id, patient_id, record_id, db_session)
 
     return PatientRecordRead.model_validate(record)
 
@@ -80,9 +84,11 @@ async def put_record(
     record_id: str,
     record: PatientRecordUpdate,
     account_id: Annotated[str, Depends(get_account_id)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_record = update_record(account_id, patient_id, record_id, record, db)
+    updated_record = update_record(
+        account_id, patient_id, record_id, record, db_session
+    )
 
     return PatientRecordRead.model_validate(updated_record)
 
@@ -95,6 +101,6 @@ async def put_record(
     patient_id: str,
     record_id: str,
     account_id: Annotated[str, Depends(get_account_id)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_record(account_id, patient_id, record_id, db)
+    return delete_record(account_id, patient_id, record_id, db_session)
