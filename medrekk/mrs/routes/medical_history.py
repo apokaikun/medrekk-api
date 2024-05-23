@@ -9,7 +9,7 @@ from medrekk.mrs.controllers.medical_history import (
     read_medical_history,
     update_medical_history,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_session
 from medrekk.mrs.schemas.patients import (
     PatientMedicalHistoryCreate,
     PatientMedicalHistoryRead,
@@ -33,9 +33,11 @@ medical_history_routes = APIRouter(
 async def add_patient_medical_history(
     patient_id: str,
     medical_history: PatientMedicalHistoryCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_medical_history = create_medical_history(patient_id, medical_history, db)
+    new_medical_history = create_medical_history(
+        patient_id, medical_history, db_session
+    )
 
     return new_medical_history
 
@@ -46,9 +48,9 @@ async def add_patient_medical_history(
 )
 async def get_patient_medical_history(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    medical_history = read_medical_history(patient_id, db)
+    medical_history = read_medical_history(patient_id, db_session)
 
     return medical_history
 
@@ -60,10 +62,10 @@ async def get_patient_medical_history(
 async def update_patient_medical_history(
     patient_id: str,
     medical_history: PatientMedicalHistoryUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
     updated_medical_history = update_medical_history(
-        patient_id, medical_history, db
+        patient_id, medical_history, db_session
     )
 
     return updated_medical_history
@@ -75,6 +77,6 @@ async def update_patient_medical_history(
 )
 async def delete_patient_medical_history(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_medical_history(patient_id, db)
+    return delete_medical_history(patient_id, db_session)
