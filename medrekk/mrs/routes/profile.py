@@ -3,10 +3,10 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from medrekk.common.database.connection import get_session
+from medrekk.common.utils.auth import verify_jwt_token
 from medrekk.mrs.controllers.profile import create_patient, read_patient, read_patients
-from medrekk.common.database.connection import get_db
 from medrekk.mrs.schemas.patients import PatientProfileCreate, PatientProfileRead
-from medrekk.common.utils.auth import get_account_id, verify_jwt_token
 
 patient_routes = APIRouter(
     prefix="/patients", dependencies=[Depends(verify_jwt_token)], tags=["Patients"]
@@ -22,9 +22,9 @@ patient_routes = APIRouter(
 )
 async def add_patient(
     patient: PatientProfileCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_patient = create_patient(patient, db)
+    new_patient = create_patient(patient, db_session)
 
     return PatientProfileRead.model_validate(new_patient)
 
@@ -36,9 +36,9 @@ async def add_patient(
     responses={},
 )
 async def list_patients(
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    patients = read_patients(db)
+    patients = read_patients(db_session)
 
     return [PatientProfileRead.model_validate(patient) for patient in patients]
 
@@ -49,9 +49,9 @@ async def list_patients(
 )
 async def get_patient(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    patient = read_patient(patient_id, db)
+    patient = read_patient(patient_id, db_session)
 
     return PatientProfileRead.model_validate(patient)
 
@@ -63,7 +63,7 @@ async def get_patient(
 # )
 async def put_patient(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
     pass
 
@@ -75,6 +75,6 @@ async def put_patient(
 # )
 async def delete_patient(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
     pass
