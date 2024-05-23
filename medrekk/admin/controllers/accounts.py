@@ -24,7 +24,6 @@ def create_account(
     )
 
     if duplicate:
-        db.close()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={
