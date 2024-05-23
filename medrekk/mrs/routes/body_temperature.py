@@ -3,7 +3,7 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.controllers.body_temperature import (
     create_bodytemp,
     delete_bodytemp,
@@ -35,9 +35,9 @@ bodytemp_routes = APIRouter(
 async def add_patient_body_temperature(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     bodytemp: PatientBodyTemperatureCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_temp = create_bodytemp(record_id, bodytemp, db)
+    new_temp = create_bodytemp(record_id, bodytemp, db_session)
 
     return new_temp
 
@@ -48,9 +48,9 @@ async def add_patient_body_temperature(
 )
 async def get_patient_body_temperatures(
     record_id: Annotated[str, Depends(account_record_id_validate)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ) -> PatientBodyTemperatureRead:
-    bodytemps = read_bodytemps(record_id, db)
+    bodytemps = read_bodytemps(record_id, db_session)
 
     return bodytemps
 
@@ -59,9 +59,9 @@ async def get_patient_body_temperatures(
 async def get_patient_body_temperature(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     bodytemp_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ) -> PatientBodyTemperatureRead:
-    bodytemp = read_bodytemp(record_id, bodytemp_id, db)
+    bodytemp = read_bodytemp(record_id, bodytemp_id, db_session)
 
     return bodytemp
 
@@ -74,9 +74,9 @@ async def update_patient_body_temperature(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     bodytemp_id: str,
     bodytemp: PatientBodyTemperatureUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_bodytemp = update_bodytemp(record_id, bodytemp_id, bodytemp, db)
+    updated_bodytemp = update_bodytemp(record_id, bodytemp_id, bodytemp, db_session)
 
     return updated_bodytemp
 
@@ -85,6 +85,6 @@ async def update_patient_body_temperature(
 async def delete_patient_body_temperature(
     record_id: Annotated[str, Depends(get_db)],
     bodytemp_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_bodytemp(record_id, bodytemp_id, db)
+    return delete_bodytemp(record_id, bodytemp_id, db_session)
