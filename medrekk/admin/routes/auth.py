@@ -6,11 +6,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from medrekk.admin.controllers.auth import authenticate_user
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_session
 from medrekk.common.utils.auth import get_host
 from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.admin.schemas.token import Token
-from medrekk.common.utils.constants import VERSION, VERSION_SUFFIX
 
 auth_routes = APIRouter(tags=["Authentication"])
 
@@ -34,9 +33,9 @@ auth_routes = APIRouter(tags=["Authentication"])
 def auth(
     host: Annotated[str, Depends(get_host)],
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ) -> Token:
-    access_token = authenticate_user(host, form_data, db)
+    access_token = authenticate_user(host, form_data, db_session)
 
     return JSONResponse(
         headers={"WWW-Authenticate": f"Bearer {access_token}"},
