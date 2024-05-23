@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.diagnosis import (
     read_patient_diagnoses,
     update_patient_diagnosis,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.schemas.patients import (
     PatientDiagnosisCreate,
     PatientDiagnosisRead,
@@ -36,9 +36,9 @@ diagnosis_routes = APIRouter(
 async def add_diagnosis(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     diagnosis: PatientDiagnosisCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_bp = create_patient_diagnosis(record_id, diagnosis, db)
+    new_bp = create_patient_diagnosis(record_id, diagnosis, db_session)
 
     return PatientDiagnosisRead.model_validate(new_bp)
 
@@ -50,9 +50,9 @@ async def add_diagnosis(
 )
 async def get_diagnoses(
     record_id: Annotated[str, Depends(account_record_id_validate)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    diagnoses = read_patient_diagnoses(record_id, db)
+    diagnoses = read_patient_diagnoses(record_id, db_session)
 
     validated = []
     for bp in diagnoses:
@@ -69,9 +69,9 @@ async def get_diagnoses(
 async def get_diagnosis(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     diagnosis_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    diagnosis = read_patient_diagnosis(record_id, diagnosis_id, db)
+    diagnosis = read_patient_diagnosis(record_id, diagnosis_id, db_session)
 
     return PatientDiagnosisRead.model_validate(diagnosis)
 
@@ -85,9 +85,9 @@ async def put_diagnosis(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     diagnosis_id: str,
     diagnosis: PatientDiagnosisUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_diagnosis = update_patient_diagnosis(record_id, diagnosis_id, diagnosis, db)
+    updated_diagnosis = update_patient_diagnosis(record_id, diagnosis_id, diagnosis, db_session)
 
     return PatientDiagnosisRead.model_validate(updated_diagnosis)
 
@@ -99,6 +99,6 @@ async def put_diagnosis(
 async def delete_diagnosis(
     record_id: Annotated[str, Depends(account_record_id_validate)],
     diagnosis_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_patient_diagnosis(record_id, diagnosis_id, db)
+    return delete_patient_diagnosis(record_id, diagnosis_id, db_session)
