@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.allergy import (
     read_allergies,
     update_allergy,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_session
 from medrekk.mrs.schemas.patients import (
     PatientAllergyCreate,
     PatientAllergyRead,
@@ -34,9 +34,9 @@ allergy_routes = APIRouter(
 async def add_patient_allergy(
     patient_id: str,
     allergy: PatientAllergyCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_allergy = create_allergy(patient_id, allergy, db)
+    new_allergy = create_allergy(patient_id, allergy, db_session)
 
     return new_allergy
 
@@ -46,9 +46,9 @@ async def add_patient_allergy(
 )
 async def get_patient_hospitalization_histories(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)]
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    hospitalization_histories = read_allergies(patient_id, db)
+    hospitalization_histories = read_allergies(patient_id, db_session)
 
     return hospitalization_histories
 
@@ -59,9 +59,9 @@ async def get_patient_hospitalization_histories(
 async def get_patient_allergy(
     patient_id: str,
     allergy_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    allergy = read_allergy(patient_id, allergy_id, db)
+    allergy = read_allergy(patient_id, allergy_id, db_session)
 
     return allergy
 
@@ -73,9 +73,9 @@ async def update_patient_allergy(
     patient_id: str,
     allergy_id: str,
     allergy: PatientAllergyUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_allergy = update_allergy(patient_id, allergy_id, allergy, db)
+    updated_allergy = update_allergy(patient_id, allergy_id, allergy, db_session)
 
     return updated_allergy
 
@@ -86,6 +86,6 @@ async def update_patient_allergy(
 async def delete_patient_allergy(
     patient_id: str,
     allergy_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_allergy(patient_id, allergy_id, db)
+    return delete_allergy(patient_id, allergy_id, db_session)
