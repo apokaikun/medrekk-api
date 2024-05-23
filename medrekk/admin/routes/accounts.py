@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from medrekk.admin.controllers.accounts import create_account, read_account
 from medrekk.admin.schemas.accounts import AccountCreate, AccountRead
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_db, get_session
 from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.common.utils import routes
 from medrekk.common.utils.auth import get_account_id, get_user_id, verify_jwt_token
@@ -37,9 +37,9 @@ account_routes = APIRouter(
 )
 async def new_account(
     account: AccountCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_account = create_account(account, db)
+    new_account = create_account(account, db_session)
     return new_account
 
 
@@ -63,9 +63,9 @@ account_routes_verified = APIRouter(
 async def get_account(
     account_id: Annotated[str, Depends(get_account_id)],
     user_id: Annotated[str, Depends(get_user_id)],
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    account = read_account(account_id, user_id, db)
+    account = read_account(account_id, user_id, db_session)
     return account
 
 
