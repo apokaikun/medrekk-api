@@ -3,20 +3,20 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from medrekk.common.database.connection import get_session
+from medrekk.common.utils import routes
+from medrekk.common.utils.auth import verify_jwt_token
 from medrekk.mrs.controllers.ob_history import (
     create_ob_history,
     delete_ob_history,
     read_ob_history,
     update_ob_history,
 )
-from medrekk.common.database.connection import get_db
 from medrekk.mrs.schemas.patients import (
     PatientOBHistoryCreate,
     PatientOBHistoryRead,
     PatientOBHistoryUpdate,
 )
-from medrekk.common.utils import routes
-from medrekk.common.utils.auth import verify_jwt_token
 
 ob_history_routes = APIRouter(
     prefix=f"/{routes.PATIENTS}" + "/{patient_id}" + f"/{routes.OBHISTROY}",
@@ -33,9 +33,9 @@ ob_history_routes = APIRouter(
 async def add_patient_ob_history(
     patient_id: str,
     ob_history: PatientOBHistoryCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_ob_history = create_ob_history(patient_id, ob_history, db)
+    new_ob_history = create_ob_history(patient_id, ob_history, db_session)
 
     return new_ob_history
 
@@ -46,9 +46,9 @@ async def add_patient_ob_history(
 )
 async def get_patient_ob_history(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    ob_history = read_ob_history(patient_id, db)
+    ob_history = read_ob_history(patient_id, db_session)
 
     return ob_history
 
@@ -60,11 +60,9 @@ async def get_patient_ob_history(
 async def update_patient_ob_history(
     patient_id: str,
     ob_history: PatientOBHistoryUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_ob_history = update_ob_history(
-        patient_id, ob_history, db
-    )
+    updated_ob_history = update_ob_history(patient_id, ob_history, db_session)
 
     return updated_ob_history
 
@@ -75,6 +73,6 @@ async def update_patient_ob_history(
 )
 async def delete_patient_ob_history(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_ob_history(patient_id, db)
+    return delete_ob_history(patient_id, db_session)
