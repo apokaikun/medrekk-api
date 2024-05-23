@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.immunization import (
     read_immunizations,
     update_immunization,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_session
 from medrekk.mrs.schemas.patients import (
     PatientImmunizationCreate,
     PatientImmunizationRead,
@@ -34,23 +34,24 @@ immunization_routes = APIRouter(
 async def add_patient_immunization(
     patient_id: str,
     immunization: PatientImmunizationCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_immunization = create_immunization(patient_id, immunization, db)
+    new_immunization = create_immunization(patient_id, immunization, db_session)
 
     return new_immunization
+
 
 @immunization_routes.get(
     "/",
     response_model=List[PatientImmunizationRead],
 )
 async def get_patient_immunizations(
-    patient_id: str,
-    db: Annotated[Session, Depends(get_db)]
+    patient_id: str, db_session: Annotated[Session, Depends(get_session)]
 ):
-    immunizations = read_immunizations(patient_id, db)
+    immunizations = read_immunizations(patient_id, db_session)
 
     return immunizations
+
 
 @immunization_routes.get(
     "/{immunization_id}",
@@ -59,11 +60,12 @@ async def get_patient_immunizations(
 async def get_patient_immunization(
     patient_id: str,
     immunization_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    immunization = read_immunization(patient_id, immunization_id, db)
+    immunization = read_immunization(patient_id, immunization_id, db_session)
 
     return immunization
+
 
 @immunization_routes.put(
     "/{immunization_id}",
@@ -73,11 +75,17 @@ async def update_patient_immunization(
     patient_id: str,
     immunization_id: str,
     immunization: PatientImmunizationUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_immunization = update_immunization(patient_id, immunization_id, immunization, db)
+    updated_immunization = update_immunization(
+        patient_id,
+        immunization_id,
+        immunization,
+        db_session,
+    )
 
     return updated_immunization
+
 
 @immunization_routes.delete(
     "/{immunization_id}",
@@ -86,6 +94,6 @@ async def update_patient_immunization(
 async def delete_patient_immunization(
     patient_id: str,
     immunization_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_immunization(patient_id, immunization_id, db)
+    return delete_immunization(patient_id, immunization_id, db_session)
