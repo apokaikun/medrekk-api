@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.medication import (
     read_medications,
     update_medication,
 )
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_session
 from medrekk.mrs.schemas.patients import (
     PatientMedicationCreate,
     PatientMedicationRead,
@@ -34,9 +34,9 @@ medication_routes = APIRouter(
 async def add_patient_medication(
     patient_id: str,
     medication: PatientMedicationCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_medication = create_medication(patient_id, medication, db)
+    new_medication = create_medication(patient_id, medication, db_session)
 
     return new_medication
 
@@ -46,9 +46,9 @@ async def add_patient_medication(
 )
 async def get_patient_medications(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)]
+    db_session: Annotated[Session, Depends(get_session)]
 ):
-    medications = read_medications(patient_id, db)
+    medications = read_medications(patient_id, db_session)
 
     return medications
 
@@ -59,9 +59,9 @@ async def get_patient_medications(
 async def get_patient_medication(
     patient_id: str,
     medication_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    medication = read_medication(patient_id, medication_id, db)
+    medication = read_medication(patient_id, medication_id, db_session)
 
     return medication
 
@@ -73,9 +73,9 @@ async def update_patient_medication(
     patient_id: str,
     medication_id: str,
     medication: PatientMedicationUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_medication = update_medication(patient_id, medication_id, medication, db)
+    updated_medication = update_medication(patient_id, medication_id, medication, db_session)
 
     return updated_medication
 
@@ -86,6 +86,6 @@ async def update_patient_medication(
 async def delete_patient_medication(
     patient_id: str,
     medication_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_medication(patient_id, medication_id, db)
+    return delete_medication(patient_id, medication_id, db_session)
