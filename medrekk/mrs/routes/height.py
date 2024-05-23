@@ -3,7 +3,7 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from medrekk.common.database.connection import get_db
+from medrekk.common.database.connection import get_session
 from medrekk.mrs.controllers.height import create_height, delete_height, read_height, read_heights, update_height
 from medrekk.mrs.schemas.patients import (
     PatientHeightCreate,
@@ -28,9 +28,9 @@ bodyheight_routes = APIRouter(
 async def add_patient_height(
     patient_id: str,
     height: PatientHeightCreate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    new_height = create_height(patient_id, height, db)
+    new_height = create_height(patient_id, height, db_session)
 
     return new_height
 
@@ -40,9 +40,9 @@ async def add_patient_height(
 )
 async def get_patient_heights(
     patient_id: str,
-    db: Annotated[Session, Depends(get_db)]
+    db_session: Annotated[Session, Depends(get_session)]
 ):
-    heights = read_heights(patient_id, db)
+    heights = read_heights(patient_id, db_session)
 
     return heights
 
@@ -53,9 +53,9 @@ async def get_patient_heights(
 async def get_patient_height(
     patient_id: str,
     height_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    height = read_height(patient_id, height_id, db)
+    height = read_height(patient_id, height_id, db_session)
 
     return height
 
@@ -67,9 +67,9 @@ async def update_patient_height(
     patient_id: str,
     height_id: str,
     height: PatientHeightUpdate,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_height = update_height(patient_id, height_id, height, db)
+    updated_height = update_height(patient_id, height_id, height, db_session)
 
     return updated_height
 
@@ -80,6 +80,6 @@ async def update_patient_height(
 async def delete_patient_height(
     patient_id: str,
     height_id: str,
-    db: Annotated[Session, Depends(get_db)],
+    db_session: Annotated[Session, Depends(get_session)],
 ):
-    return delete_height(patient_id, height_id, db)
+    return delete_height(patient_id, height_id, db_session)
