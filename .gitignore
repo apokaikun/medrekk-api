@@ -1,6 +1,7 @@
 *.sqlite*
 *.db
-connection.py
+db_const.py
+# connection.py
 test.py
 .vscode/
 
