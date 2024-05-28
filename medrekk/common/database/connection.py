@@ -21,29 +21,29 @@ def create_db_and_tables():
         print("Error creating tables. \n", e)
 
 
-def get_db():
-    try:
-        db = SessionLocal()
-        # Base.metadata.drop_all(engine)
-        # Base.metadata.create_all(engine)
+# def get_db():
+#     try:
+#         db = SessionLocal()
+#         Base.metadata.drop_all(engine)
+#         Base.metadata.create_all(engine)
 
-        yield db
-    except HTTPException as http_error:
-        # All exceptions caught in the controller or router are raised as HTTPException, 
-        # therefore it will be thrown as is.
-        raise http_error
-    except (DBAPIError, Exception):
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "content": {
-                    "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
-                },
-            },
-        )
-    finally:
-        db.close()
+#         yield db
+#     except HTTPException as http_error:
+#         # All exceptions caught in the controller or router are raised as HTTPException, 
+#         # therefore it will be thrown as is.
+#         raise http_error
+#     except (DBAPIError, Exception):
+#         raise HTTPException(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#             detail={
+#                 "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+#                 "content": {
+#                     "msg": "The server encountered an unexpected condition that prevented it from fulfilling the request. If the error occurs after several retries, please contact the administrator at: ...",
+#                 },
+#             },
+#         )
+#     finally:
+#         db.close()
 
 
 def get_session():

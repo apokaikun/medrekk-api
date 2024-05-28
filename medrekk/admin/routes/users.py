@@ -1,12 +1,12 @@
 from typing import Annotated, List
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
 from medrekk.admin.controllers.users import add_account_user, read_user, read_users
-from medrekk.common.database.connection import get_db, get_session
+from medrekk.common.database.connection import get_session
 from medrekk.admin.schemas.accounts import UserCreate, UserListItem, UserRead
 from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.common.utils import routes

@@ -3,21 +3,21 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from medrekk.common.database.connection import get_session
+from medrekk.common.utils import routes
+from medrekk.common.utils.auth import account_record_id_validate, verify_jwt_token
 from medrekk.mrs.controllers.diagnosis import (
     create_patient_diagnosis,
     delete_patient_diagnosis,
-    read_patient_diagnosis,
     read_patient_diagnoses,
+    read_patient_diagnosis,
     update_patient_diagnosis,
 )
-from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.schemas.patients import (
     PatientDiagnosisCreate,
     PatientDiagnosisRead,
     PatientDiagnosisUpdate,
 )
-from medrekk.common.utils import routes
-from medrekk.common.utils.auth import account_record_id_validate, verify_jwt_token
 
 diagnosis_routes = APIRouter(
     prefix=f"/{routes.RECORDS}" + "/{record_id}" + f"/{routes.DIAGNOSIS}",
@@ -87,7 +87,9 @@ async def put_diagnosis(
     diagnosis: PatientDiagnosisUpdate,
     db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_diagnosis = update_patient_diagnosis(record_id, diagnosis_id, diagnosis, db_session)
+    updated_diagnosis = update_patient_diagnosis(
+        record_id, diagnosis_id, diagnosis, db_session
+    )
 
     return PatientDiagnosisRead.model_validate(updated_diagnosis)
 

@@ -10,7 +10,7 @@ from medrekk.mrs.controllers.bloodpressure import (
     read_patient_bloodpressures,
     update_patient_bloodpressure,
 )
-from medrekk.common.database.connection import get_db, get_session
+from medrekk.common.database.connection import get_session
 from medrekk.mrs.schemas.patients import (
     PatientBloodPressureCreate,
     PatientBloodPressureRead,

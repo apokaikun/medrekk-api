@@ -3,7 +3,7 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from medrekk.common.database.connection import get_db, get_session
+from medrekk.common.database.connection import get_session
 from medrekk.mrs.controllers.body_temperature import (
     create_bodytemp,
     delete_bodytemp,
@@ -83,7 +83,7 @@ async def update_patient_body_temperature(
 
 @bodytemp_routes.delete("/{bodytemp_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_patient_body_temperature(
-    record_id: Annotated[str, Depends(get_db)],
+    record_id: Annotated[str, Depends(get_session)],
     bodytemp_id: str,
     db_session: Annotated[Session, Depends(get_session)],
 ):

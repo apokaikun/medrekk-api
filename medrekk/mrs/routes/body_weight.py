@@ -3,6 +3,9 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from medrekk.common.database.connection import get_session
+from medrekk.common.utils import routes
+from medrekk.common.utils.auth import verify_jwt_token
 from medrekk.mrs.controllers.body_weight import (
     create_bodyweight,
     delete_bodyweight,
@@ -10,14 +13,11 @@ from medrekk.mrs.controllers.body_weight import (
     read_bodyweights,
     update_bodyweight,
 )
-from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.schemas.patients import (
     PatientBodyWeightCreate,
     PatientBodyWeightRead,
     PatientBodyWeightUpdate,
 )
-from medrekk.common.utils import routes
-from medrekk.common.utils.auth import verify_jwt_token
 
 bodyweight_routes = APIRouter(
     prefix=f"/{routes.PATIENTS}" + "/{patient_id}" + f"/{routes.BODYWEIGHTS}",
@@ -75,7 +75,9 @@ async def update_patient_bodyweight(
     bodyweight: PatientBodyWeightUpdate,
     db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_bodyweight = update_bodyweight(patient_id, bodyweight_id, bodyweight, db_session)
+    updated_bodyweight = update_bodyweight(
+        patient_id, bodyweight_id, bodyweight, db_session
+    )
 
     return updated_bodyweight
 

@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from medrekk.admin.schemas.accounts import UserRead
 from medrekk.admin.db.token import token_store
-from medrekk.common.database.connection import get_db, get_session
+from medrekk.common.database.connection import get_session
 from medrekk.common.dependencies import oauth2_scheme
 from medrekk.common.models.medrekk import MedRekkAccount
 from medrekk.common.models.patient import PatientRecord

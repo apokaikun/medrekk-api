@@ -1,12 +1,11 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
-from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from medrekk.admin.controllers.accounts import create_account, read_account
 from medrekk.admin.schemas.accounts import AccountCreate, AccountRead
-from medrekk.common.database.connection import get_db, get_session
+from medrekk.common.database.connection import get_session
 from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.common.utils import routes
 from medrekk.common.utils.auth import get_account_id, get_user_id, verify_jwt_token

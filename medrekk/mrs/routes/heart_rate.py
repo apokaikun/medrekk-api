@@ -3,6 +3,9 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+from medrekk.common.database.connection import get_session
+from medrekk.common.utils import routes
+from medrekk.common.utils.auth import account_record_id_validate, verify_jwt_token
 from medrekk.mrs.controllers.heart_rate import (
     create_patient_heartrate,
     delete_patient_heartrate,
@@ -10,14 +13,11 @@ from medrekk.mrs.controllers.heart_rate import (
     read_patient_heartrates,
     update_patient_heartrate,
 )
-from medrekk.common.database.connection import get_db, get_session
 from medrekk.mrs.schemas.patients import (
     PatientHeartRateCreate,
     PatientHeartRateRead,
     PatientHeartRateUpdate,
 )
-from medrekk.common.utils import routes
-from medrekk.common.utils.auth import account_record_id_validate, verify_jwt_token
 
 heartrate_routes = APIRouter(
     prefix=f"/{routes.RECORDS}" + "/{record_id}" + f"/{routes.HEARTRATES}",
@@ -87,7 +87,9 @@ async def put_patient_heartrate(
     heartrate: PatientHeartRateUpdate,
     db_session: Annotated[Session, Depends(get_session)],
 ):
-    updated_heartrate = update_patient_heartrate(record_id, heartrate_id, heartrate, db_session)
+    updated_heartrate = update_patient_heartrate(
+        record_id, heartrate_id, heartrate, db_session
+    )
 
     return PatientHeartRateRead.model_validate(updated_heartrate)
 

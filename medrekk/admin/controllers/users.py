@@ -2,7 +2,6 @@ from typing import List
 
 from fastapi import HTTPException, status
 from psycopg.errors import UniqueViolation
-from sqlalchemy import select
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
