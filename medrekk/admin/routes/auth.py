@@ -1,15 +1,16 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from medrekk.admin.controllers.auth import authenticate_user
-from medrekk.common.database.connection import get_session
-from medrekk.common.utils.auth import get_host
-from medrekk.schemas.responses import HTTP_EXCEPTION
 from medrekk.admin.schemas.token import Token
+from medrekk.common.database.connection import get_session
+from medrekk.common.dependencies import oauth2_scheme
+from medrekk.common.utils.auth import expire_token, get_host
+from medrekk.schemas.responses import HTTP_EXCEPTION
 
 auth_routes = APIRouter(tags=["Authentication"])
 
@@ -41,3 +42,8 @@ def auth(
         headers={"WWW-Authenticate": f"Bearer {access_token}"},
         content={"access_token": access_token, "token_type": "bearer"},
     )
+
+
+@auth_routes.post("/logout", status_code=status.HTTP_200_OK)
+async def logout(token: Annotated[str, Depends(oauth2_scheme)]) -> None:
+    return expire_token(token)
