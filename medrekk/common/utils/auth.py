@@ -65,6 +65,11 @@ def verify_jwt_token(token: Annotated[str, Depends(oauth2_scheme)]) -> bool:
             },
         )
 
+def expire_token(token: str):
+    unverified = jwt.get_unverified_claims(token)
+    jti = unverified["jti"]
+    return token_store.remove_token(jti=jti)
+
 
 def get_user_id(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     unverified = jwt.get_unverified_claims(token)
