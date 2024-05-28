@@ -15,5 +15,8 @@ class TokenStorage:
     def get_token(self, jti: str) -> str | None:
         return self.db.get(jti)
     
+    def remove_token(self, jti: str) -> None:
+        self.db.delete(jti)
+    
 
 token_store = TokenStorage(db=token_db)
